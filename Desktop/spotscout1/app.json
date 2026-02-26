@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "SpotScout",
+    "slug": "spotscout",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": { "backgroundColor": "#0A1628" },
+    "plugins": [
+      ["expo-camera", {
+        "cameraPermission": "SpotScout needs camera access to scan library QR codes."
+      }],
+      ["expo-barcode-scanner", {
+        "cameraPermission": "SpotScout needs camera access to scan library QR codes."
+      }]
+    ],
+    "android": {
+      "package": "com.spotscout.app",
+      "permissions": ["CAMERA"],
+      "adaptiveIcon": {
+        "backgroundColor": "#0A1628"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.spotscout.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "SpotScout needs camera access to scan library QR codes."
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-will-go-here"
+      }
+    }
+  }
+}
