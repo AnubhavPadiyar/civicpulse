@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CivicPulse — My Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #2ECC71; --green-dark: #25a85c; --green-soft: #e8f8ef; --green-mid: #c5edd6;
+      --cream: #F5F0E8; --white: #ffffff; --text: #1f2d1f; --text-mid: #4a5e4a;
+      --text-light: #7a907a; --border: #dde8dd; --navy: #1f2d1f;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+    a { text-decoration: none; }
+
+    /* NAV */
+    nav { background: var(--white); border-bottom: 1.5px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-inner { padding: 0 5%; height: 62px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 9px; }
+    .logo-mark { width: 34px; height: 34px; background: var(--green); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .logo-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--text); }
+    .nav-right { display: flex; gap: 8px; }
+    .btn-sm { padding: 6px 14px; border: 1.5px solid var(--border); background: transparent; color: var(--text-mid); border-radius: 7px; font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
+    .btn-sm:hover { border-color: var(--green); color: var(--text); }
+    .btn-sm-green { padding: 6px 14px; background: var(--green); color: white; border: none; border-radius: 7px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+    .btn-sm-green:hover { background: var(--green-dark); }
+
+    /* PAGE */
+    .page { max-width: 900px; margin: auto; padding: 44px 5% 80px; }
+
+    /* PROFILE HERO */
+    .profile-hero {
+      background: var(--navy); border-radius: 18px; padding: 36px;
+      display: flex; align-items: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--green); display: flex; align-items: center; justify-content: center;
+      font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--navy);
+      flex-shrink: 0;
+    }
+    .profile-info { flex: 1; }
+    .profile-name { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; color: white; letter-spacing: -0.3px; margin-bottom: 4px; }
+    .profile-email { font-size: 0.85rem; color: rgba(255,255,255,0.45); margin-bottom: 12px; }
+    .profile-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .profile-tag { padding: 4px 12px; background: rgba(46,204,113,0.15); border: 1px solid rgba(46,204,113,0.25); border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--green); }
+
+    .points-box { text-align: center; }
+    .points-num { font-family: 'Outfit', sans-serif; font-size: 2.4rem; font-weight: 800; color: var(--green); line-height: 1; }
+    .points-label { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+    /* STATS ROW */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .stat-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; }
+    .stat-num { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text); }
+    .stat-num span { color: var(--green); }
+    .stat-label { font-size: 0.78rem; color: var(--text-light); margin-top: 4px; font-weight: 500; }
+
+    /* SECTION */
+    .section-title { font-family: 'Outfit', sans-serif; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); margin-bottom: 14px; }
+
+    /* BADGES */
+    .badges-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .badges-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .badge-item { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 8px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--cream); transition: all 0.15s; }
+    .badge-item.earned { border-color: var(--green-mid); background: var(--green-soft); }
+    .badge-item.locked { opacity: 0.45; filter: grayscale(0.5); }
+    .badge-emoji { font-size: 1.6rem; }
+    .badge-name { font-family: 'Outfit', sans-serif; font-size: 0.7rem; font-weight: 700; color: var(--text-mid); text-align: center; line-height: 1.3; }
+    .badge-pts { font-size: 0.68rem; color: var(--green-dark); font-weight: 600; }
+    .badge-locked-label { font-size: 0.65rem; color: var(--text-light); }
+
+    /* COMPLAINTS HISTORY */
+    .history-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .complaint-row {
+      display: flex; align-items: center; gap: 14px; padding: 14px 0;
+      border-bottom: 1px solid var(--border); cursor: pointer;
+      transition: background 0.15s; border-radius: 8px; margin: 0 -8px; padding: 14px 8px;
+    }
+    .complaint-row:last-child { border-bottom: none; }
+    .complaint-row:hover { background: var(--cream); }
+    .c-icon { width: 38px; height: 38px; border-radius: 9px; background: var(--green-soft); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .c-info { flex: 1; }
+    .c-type { font-family: 'Outfit', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .c-meta { font-size: 0.75rem; color: var(--text-light); }
+    .c-id { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-light); }
+    .c-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+    .status-pill { padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+    .s-submitted { background: #f0f0f0; color: #555; }
+    .s-under-review { background: #e8f0ff; color: #2563eb; }
+    .s-in-progress { background: #fff4e6; color: #c87c00; }
+    .s-resolved { background: var(--green-soft); color: var(--green-dark); }
+    .s-rejected { background: #ffeaea; color: #c0392b; }
+
+    /* LEADERBOARD */
+    .leaderboard-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .lb-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-row.highlight { background: var(--green-soft); margin: 0 -8px; padding: 12px 8px; border-radius: 8px; border-bottom: none; }
+    .lb-rank { font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 800; color: var(--text-light); width: 28px; text-align: center; flex-shrink: 0; }
+    .lb-rank.top { color: var(--green-dark); }
+    .lb-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; font-family: 'Outfit', sans-serif; color: var(--text-mid); flex-shrink: 0; }
+    .lb-avatar.you { background: var(--green); color: var(--navy); }
+    .lb-name { flex: 1; font-size: 0.875rem; font-weight: 600; color: var(--text); font-family: 'Outfit', sans-serif; }
+    .lb-you-tag { font-size: 0.65rem; color: var(--green-dark); font-weight: 700; background: var(--green-mid); padding: 1px 6px; border-radius: 10px; margin-left: 6px; }
+    .lb-pts { font-family: 'Outfit', sans-serif; font-size: 0.875rem; font-weight: 700; color: var(--text); }
+    .lb-pts span { color: var(--green-dark); }
+
+    /* EMPTY */
+    .empty { text-align: center; padding: 32px 20px; color: var(--text-light); font-size: 0.875rem; }
+
+    /* SPINNER */
+    .spinner-wrap { text-align: center; padding: 32px; }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; margin: auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 640px) {
+      .badges-grid { grid-template-columns: repeat(3, 1fr); }
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+      .profile-hero { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">📍</div>
+      <span class="logo-name">CivicPulse</span>
+    </a>
+    <div class="nav-right">
+      <a href="submit.html" class="btn-sm-green">+ Report Issue</a>
+      <a href="track.html" class="btn-sm">Track</a>
+      <button class="btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <div class="avatar" id="avatarInitial">?</div>
+    <div class="profile-info">
+      <div class="profile-name" id="profileName">Loading...</div>
+      <div class="profile-email" id="profileEmail"></div>
+      <div class="profile-tags">
+        <span class="profile-tag">🏙️ Active Citizen</span>
+        <span class="profile-tag" id="rankTag">Rank #—</span>
+      </div>
+    </div>
+    <div class="points-box">
+      <div class="points-num" id="profilePoints">0</div>
+      <div class="points-label">Total Points</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="statTotal">—</div>
+      <div class="stat-label">Complaints Filed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statResolved">—</div>
+      <div class="stat-label">Resolved</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statBadges">—</div>
+      <div class="stat-label">Badges Earned</div>
+    </div>
+  </div>
+
+  <!-- BADGES -->
+  <div class="badges-card">
+    <div class="section-title">Badges</div>
+    <div class="badges-grid" id="badgesGrid">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- COMPLAINT HISTORY -->
+  <div class="history-card">
+    <div class="section-title">My Complaints</div>
+    <div id="historyContent">
+      <div class="spinner-wrap"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="leaderboard-card">
+    <div class="section-title">Leaderboard</div>
+    <div id="leaderboardContent">
+      <div class="spinner-wrap"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('cp_token');
+  const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
+  if (!token) window.location.href = 'login.html';
+
+  const ALL_BADGES = [
+    { id: 'civic_starter', emoji: '🌱', name: 'Civic Starter', pts: '50 pts', desc: 'First complaint' },
+    { id: 'eco_warrior', emoji: '♻️', name: 'Eco Warrior', pts: '200 pts', desc: 'SDG complaint' },
+    { id: 'rapid_reporter', emoji: '⚡', name: 'Rapid Reporter', pts: '150 pts', desc: 'High priority issue' },
+    { id: 'city_guardian', emoji: '🛡️', name: 'City Guardian', pts: '500 pts', desc: '10 complaints' },
+    { id: 'community_hero', emoji: '🏆', name: 'Community Hero', pts: '1000 pts', desc: 'Top 10 rank' },
+  ];
+
+  const CATEGORY_ICONS = {
+    roads: '🛣️', water: '💧', garbage: '🗑️', drainage: '🌊', electricity: '⚡', other: '📋',
+    'Roads & Infrastructure': '🛣️', 'Water Supply': '💧', 'Garbage & Waste': '🗑️',
+    'Drainage & Sewage': '🌊', 'Electricity & Streetlights': '⚡', 'Public Nuisance': '📋'
+  };
+
+  const STATUS_CLASS = {
+    'Submitted': 's-submitted', 'Under Review': 's-under-review',
+    'In Progress': 's-in-progress', 'Resolved': 's-resolved', 'Rejected': 's-rejected'
+  };
+
+  // Set profile header from localStorage first
+  if (user.name) {
+    document.getElementById('profileName').textContent = user.name;
+    document.getElementById('profileEmail').textContent = user.email || '';
+    document.getElementById('avatarInitial').textContent = user.name.charAt(0).toUpperCase();
+    document.getElementById('profilePoints').textContent = user.points || 0;
+  }
+
+  // Load full profile from API
+  async function loadProfile() {
+    try {
+      const res = await fetch(`${API}/users/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error();
+
+      const u = data.user;
+      document.getElementById('profileName').textContent = u.name;
+      document.getElementById('profileEmail').textContent = u.email;
+      document.getElementById('avatarInitial').textContent = u.name.charAt(0).toUpperCase();
+      document.getElementById('profilePoints').textContent = u.points || 0;
+
+      renderBadges(u.badges || []);
+      renderStats(data.complaints || []);
+      renderHistory(data.complaints || []);
+    } catch {
+      renderBadges(user.badges || []);
+    }
+  }
+
+  async function loadLeaderboard() {
+    try {
+      const res = await fetch(`${API}/users/leaderboard`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      renderLeaderboard(data.leaderboard || []);
+    } catch {
+      document.getElementById('leaderboardContent').innerHTML = '<div class="empty">Could not load leaderboard</div>';
+    }
+  }
+
+  function renderBadges(earned) {
+    const grid = document.getElementById('badgesGrid');
+    document.getElementById('statBadges').textContent = earned.length;
+    grid.innerHTML = ALL_BADGES.map(b => {
+      const isEarned = earned.includes(b.id);
+      return `<div class="badge-item ${isEarned ? 'earned' : 'locked'}">
+        <span class="badge-emoji">${b.emoji}</span>
+        <span class="badge-name">${b.name}</span>
+        ${isEarned
+          ? `<span class="badge-pts">${b.pts}</span>`
+          : `<span class="badge-locked-label">🔒 ${b.desc}</span>`}
+      </div>`;
+    }).join('');
+  }
+
+  function renderStats(complaints) {
+    document.getElementById('statTotal').textContent = complaints.length;
+    document.getElementById('statResolved').textContent = complaints.filter(c => c.status === 'Resolved').length;
+  }
+
+  function renderHistory(complaints) {
+    const container = document.getElementById('historyContent');
+    if (!complaints.length) {
+      container.innerHTML = '<div class="empty">No complaints filed yet. <a href="submit.html" style="color:var(--green-dark);font-weight:600;">Report your first issue →</a></div>';
+      return;
+    }
+    container.innerHTML = complaints.map(c => `
+      <div class="complaint-row" onclick="window.location.href='track.html?id=${c.trackingId}'">
+        <div class="c-icon">${CATEGORY_ICONS[c.category] || '📋'}</div>
+        <div class="c-info">
+          <div class="c-type">${c.category || 'Civic Issue'}</div>
+          <div class="c-meta">${c.location?.address ? c.location.address.split(',')[0] : 'Location not set'} · ${new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>
+        </div>
+        <div class="c-right">
+          <span class="status-pill ${STATUS_CLASS[c.status] || 's-submitted'}">${c.status}</span>
+          <span class="c-id">${c.trackingId}</span>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderLeaderboard(board) {
+    const container = document.getElementById('leaderboardContent');
+    if (!board.length) {
+      container.innerHTML = '<div class="empty">Leaderboard loading...</div>';
+      return;
+    }
+    const userId = user.id || user._id;
+    let userRank = board.findIndex(u => u._id === userId) + 1;
+    if (userRank) document.getElementById('rankTag').textContent = `Rank #${userRank}`;
+
+    container.innerHTML = board.slice(0, 10).map((u, i) => {
+      const isYou = u._id === userId;
+      const rank = i + 1;
+      return `<div class="lb-row ${isYou ? 'highlight' : ''}">
+        <span class="lb-rank ${rank <= 3 ? 'top' : ''}">${rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : rank}</span>
+        <div class="lb-avatar ${isYou ? 'you' : ''}">${u.name.charAt(0).toUpperCase()}</div>
+        <span class="lb-name">${u.name}${isYou ? '<span class="lb-you-tag">YOU</span>' : ''}</span>
+        <span class="lb-pts">${u.points} <span>pts</span></span>
+      </div>`;
+    }).join('');
+  }
+
+  function logout() {
+    localStorage.removeItem('cp_token');
+    localStorage.removeItem('cp_user');
+    window.location.href = 'login.html';
+  }
+
+  loadProfile();
+  loadLeaderboard();
+</script>
+</body>
+</html>
