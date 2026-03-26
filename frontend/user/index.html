@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CivicPulse — Report. Track. Resolve.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #2ECC71;
+      --green-dark: #25a85c;
+      --green-soft: #e8f8ef;
+      --green-mid: #c5edd6;
+      --cream: #F5F0E8;
+      --cream-dark: #EDE7D9;
+      --white: #ffffff;
+      --text: #1f2d1f;
+      --text-mid: #4a5e4a;
+      --text-light: #7a907a;
+      --border: #dde8dd;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+    a { text-decoration: none; }
+
+    /* NAV */
+    nav {
+      background: var(--white);
+      border-bottom: 1.5px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-inner {
+      padding: 0 5%;
+      height: 62px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 9px; }
+    .logo-mark {
+      width: 34px; height: 34px; background: var(--green);
+      border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    }
+    .logo-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--text); letter-spacing: -0.3px; }
+    .nav-right { display: flex; gap: 10px; }
+    .btn-ghost {
+      padding: 7px 16px; border: 1.5px solid var(--border); background: transparent;
+      color: var(--text-mid); border-radius: 8px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--green); color: var(--text); }
+    .btn-green {
+      padding: 7px 18px; background: var(--green); color: var(--white); border: none;
+      border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-green:hover { background: var(--green-dark); }
+
+    /* HERO */
+    .hero {
+      padding: 72px 5% 60px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--green-soft); border: 1px solid var(--green-mid);
+      color: var(--green-dark); padding: 5px 12px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.4px; margin-bottom: 22px;
+    }
+    .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; display: inline-block; animation: blink 1.8s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .hero h1 { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 800; color: var(--text); line-height: 1.13; letter-spacing: -1.2px; margin-bottom: 18px; }
+    .hero h1 .g { color: var(--green-dark); }
+    .hero p { color: var(--text-mid); font-size: 1rem; line-height: 1.7; margin-bottom: 34px; max-width: 420px; }
+    .hero-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-main {
+      padding: 13px 26px; background: var(--green); color: white; border-radius: 9px;
+      font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700; transition: background 0.2s;
+    }
+    .cta-main:hover { background: var(--green-dark); }
+    .cta-sec {
+      padding: 13px 22px; background: var(--white); color: var(--text-mid); border-radius: 9px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+      border: 1.5px solid var(--border); transition: border-color 0.2s;
+    }
+    .cta-sec:hover { border-color: var(--green); color: var(--text); }
+
+    /* MOCKUP */
+    .mockup { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 22px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+    .mockup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .mockup-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .status-pills { display: flex; gap: 6px; }
+    .pill { padding: 3px 10px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; }
+    .pill-green { background: var(--green-soft); color: var(--green-dark); }
+    .pill-orange { background: #fff4e6; color: #c87c00; }
+    .pill-red { background: #ffeaea; color: #c0392b; }
+    .complaint-card { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; }
+    .complaint-card:last-child { margin-bottom: 0; }
+    .c-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--green-soft); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .c-body { flex: 1; }
+    .c-type { font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .c-desc { font-size: 0.76rem; color: var(--text-light); margin-bottom: 6px; line-height: 1.4; }
+    .c-footer { display: flex; justify-content: space-between; align-items: center; }
+    .c-id { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text-light); }
+    .c-status { padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
+    .s-progress { background: #fff4e6; color: #c87c00; }
+    .s-resolved { background: var(--green-soft); color: var(--green-dark); }
+    .s-submitted { background: #f0f0f0; color: #555; }
+
+    /* CATEGORIES */
+    .cats-section { background: var(--white); border-top: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); padding: 52px 5%; }
+    .cats-inner {  }
+    .section-label { font-family: 'Outfit', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 6px; }
+    .section-heading { font-family: 'Outfit', sans-serif; font-size: 1.7rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 32px; }
+    .cats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+    .cat-item {
+      background: var(--cream); border: 1.5px solid var(--border); border-radius: 14px;
+      padding: 18px 12px; display: flex; flex-direction: column; align-items: center;
+      gap: 10px; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+    .cat-item:hover { border-color: var(--green); background: var(--green-soft); transform: translateY(-2px); }
+    .cat-emoji { font-size: 1.6rem; }
+    .cat-name { font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 600; color: var(--text-mid); text-align: center; line-height: 1.3; }
+
+    /* TRACK */
+    .track-wrap { padding: 70px 5%; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    .track-left h2 { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 10px; line-height: 1.2; }
+    .track-left p { color: var(--text-mid); font-size: 0.93rem; line-height: 1.65; margin-bottom: 28px; }
+    .track-row { display: flex; gap: 8px; }
+    .track-input {
+      flex: 1; padding: 12px 16px; background: var(--white); border: 1.5px solid var(--border);
+      border-radius: 9px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+      color: var(--text); outline: none; transition: border-color 0.2s;
+    }
+    .track-input::placeholder { color: var(--text-light); }
+    .track-input:focus { border-color: var(--green); }
+    .track-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; }
+    .track-card-label { font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 18px; }
+    .status-step { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+    .status-step:last-child { margin-bottom: 0; }
+    .step-col { display: flex; flex-direction: column; align-items: center; }
+    .step-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; flex-shrink: 0; }
+    .step-dot.done { background: var(--green); color: white; }
+    .step-dot.active { background: #fff4e6; border: 2px solid #e67e22; color: #e67e22; }
+    .step-dot.pending { background: #f0f0f0; color: #aaa; }
+    .step-line { width: 2px; height: 16px; background: var(--border); margin: 3px 0; }
+    .step-name { font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 1px; padding-top: 2px; }
+    .step-name.muted { color: var(--text-light); }
+    .step-desc { font-size: 0.72rem; color: var(--text-light); }
+
+    /* FOOTER */
+    footer { background: var(--white); border-top: 1.5px solid var(--border); padding: 28px 5%; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer-copy { font-size: 0.8rem; color: var(--text-light); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 0.8rem; color: var(--text-light); transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; gap: 40px; padding: 50px 20px 40px; }
+      .mockup { display: none; }
+      .cats-grid { grid-template-columns: repeat(3, 1fr); }
+      .track-wrap { grid-template-columns: 1fr; padding: 50px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-mark">📍</div>
+      <span class="logo-name">CivicPulse</span>
+    </div>
+    <div class="nav-right">
+      <a href="login.html" class="btn-ghost">Login</a>
+      <a href="login.html#register" class="btn-green">Report Issue</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section>
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow"><div class="dot"></div> AI-Powered · Gemini</div>
+      <h1>Report civic issues.<br/><span class="g">Get them resolved.</span></h1>
+      <p>Describe your issue in plain language — garbage, pothole, water leakage, broken streetlight. CivicPulse routes it to the right authority instantly.</p>
+      <div class="hero-cta">
+        <a href="submit.html" class="cta-main">Report an Issue →</a>
+        <a href="track.html" class="cta-sec">Track Complaint</a>
+      </div>
+    </div>
+
+    <div class="mockup">
+      <div class="mockup-header">
+        <span class="mockup-title">Recent Reports</span>
+        <div class="status-pills">
+          <span class="pill pill-red">2 Critical</span>
+          <span class="pill pill-orange">4 In Progress</span>
+          <span class="pill pill-green">11 Resolved</span>
+        </div>
+      </div>
+      <div class="complaint-card">
+        <div class="c-icon">🗑️</div>
+        <div class="c-body">
+          <div class="c-type">Garbage Overflow</div>
+          <div class="c-desc">Garbage pile near market, not collected for 4 days</div>
+          <div class="c-footer">
+            <span class="c-id">CP-A4F82B1C</span>
+            <span class="c-status s-progress">In Progress</span>
+          </div>
+        </div>
+      </div>
+      <div class="complaint-card">
+        <div class="c-icon">💧</div>
+        <div class="c-body">
+          <div class="c-type">Water Leakage</div>
+          <div class="c-desc">Pipe burst on main road, water wasting since morning</div>
+          <div class="c-footer">
+            <span class="c-id">CP-D3C92A4E</span>
+            <span class="c-status s-submitted">Submitted</span>
+          </div>
+        </div>
+      </div>
+      <div class="complaint-card">
+        <div class="c-icon">🚦</div>
+        <div class="c-body">
+          <div class="c-type">Traffic Signal Down</div>
+          <div class="c-desc">Signal at main junction not working since last night</div>
+          <div class="c-footer">
+            <span class="c-id">CP-B1E74F2D</span>
+            <span class="c-status s-resolved">Resolved ✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<div class="cats-section">
+  <div class="cats-inner">
+    <div class="section-label">What do you want to report?</div>
+    <div class="section-heading">Select a category</div>
+    <div class="cats-grid">
+      <a href="submit.html?cat=roads" class="cat-item">
+        <span class="cat-emoji">🛣️</span>
+        <span class="cat-name">Roads & Infrastructure</span>
+      </a>
+      <a href="submit.html?cat=water" class="cat-item">
+        <span class="cat-emoji">💧</span>
+        <span class="cat-name">Water Supply</span>
+      </a>
+      <a href="submit.html?cat=garbage" class="cat-item">
+        <span class="cat-emoji">🗑️</span>
+        <span class="cat-name">Garbage & Waste</span>
+      </a>
+      <a href="submit.html?cat=drainage" class="cat-item">
+        <span class="cat-emoji">🌊</span>
+        <span class="cat-name">Drainage & Sewage</span>
+      </a>
+      <a href="submit.html?cat=electricity" class="cat-item">
+        <span class="cat-emoji">⚡</span>
+        <span class="cat-name">Electricity & Streetlights</span>
+      </a>
+      <a href="submit.html?cat=other" class="cat-item">
+        <span class="cat-emoji">📋</span>
+        <span class="cat-name">Public Nuisance</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- TRACK -->
+<section>
+  <div class="track-wrap">
+    <div class="track-left">
+      <h2>Already filed?<br/>Track your complaint.</h2>
+      <p>Enter your tracking ID to see real-time status — from submission to resolution.</p>
+      <div class="track-row">
+        <input type="text" class="track-input" placeholder="CP-XXXXXXXX" id="trackInput" />
+        <button class="btn-green" onclick="trackComplaint()">Track →</button>
+      </div>
+    </div>
+
+    <div class="track-card">
+      <div class="track-card-label">Status Timeline — Example</div>
+      <div class="status-step">
+        <div class="step-col">
+          <div class="step-dot done">✓</div>
+          <div class="step-line"></div>
+        </div>
+        <div>
+          <div class="step-name">Submitted</div>
+          <div class="step-desc">Complaint received & AI processed</div>
+        </div>
+      </div>
+      <div class="status-step">
+        <div class="step-col">
+          <div class="step-dot done">✓</div>
+          <div class="step-line"></div>
+        </div>
+        <div>
+          <div class="step-name">Routed to Authority</div>
+          <div class="step-desc">Sent to Municipal Sanitation Dept.</div>
+        </div>
+      </div>
+      <div class="status-step">
+        <div class="step-col">
+          <div class="step-dot active">●</div>
+          <div class="step-line"></div>
+        </div>
+        <div>
+          <div class="step-name">In Progress</div>
+          <div class="step-desc">Team assigned, work underway</div>
+        </div>
+      </div>
+      <div class="status-step">
+        <div class="step-col">
+          <div class="step-dot pending">○</div>
+        </div>
+        <div>
+          <div class="step-name muted">Resolved</div>
+          <div class="step-desc">Awaiting confirmation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="logo">
+      <div class="logo-mark" style="width:28px;height:28px;font-size:0.8rem;">📍</div>
+      <span class="logo-name" style="font-size:1rem;">CivicPulse</span>
+    </div>
+    <span class="footer-copy">© 2026 CivicPulse. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="submit.html">Report Issue</a>
+      <a href="track.html">Track</a>
+      <a href="admin/login.html">Admin</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function trackComplaint() {
+    const id = document.getElementById('trackInput').value.trim();
+    if (!id) return;
+    window.location.href = `track.html?id=${id}`;
+  }
+  document.getElementById('trackInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') trackComplaint();
+  });
+</script>
+</body>
+</html>
