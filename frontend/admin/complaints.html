@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CivicPulse — Manage Complaints</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #2ECC71; --green-dark: #25a85c; --green-soft: #e8f8ef; --green-mid: #c5edd6;
+      --cream: #F5F0E8; --white: #ffffff; --text: #1f2d1f; --text-mid: #4a5e4a;
+      --text-light: #7a907a; --border: #dde8dd; --navy: #1f2d1f; --sidebar: #16231a;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; display: flex; }
+    a { text-decoration: none; }
+
+    /* SIDEBAR - same as dashboard */
+    .sidebar { width: 240px; background: var(--sidebar); min-height: 100vh; display: flex; flex-direction: column; padding: 24px 0; position: fixed; top: 0; left: 0; z-index: 100; }
+    .sidebar-logo { display: flex; align-items: center; gap: 9px; padding: 0 20px 28px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 20px; }
+    .logo-mark { width: 32px; height: 32px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .logo-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; color: white; }
+    .dept-tag { margin: 0 16px 20px; background: rgba(46,204,113,0.12); border: 1px solid rgba(46,204,113,0.2); border-radius: 8px; padding: 8px 12px; }
+    .dept-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.35); margin-bottom: 3px; }
+    .dept-name { font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--green); }
+    .nav-section { padding: 0 12px; margin-bottom: 6px; }
+    .nav-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.25); padding: 0 8px; margin-bottom: 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 9px; color: rgba(255,255,255,0.5); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+    .nav-item.active { background: rgba(46,204,113,0.15); color: var(--green); }
+    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-bottom { margin-top: auto; padding: 16px 12px 0; border-top: 1px solid rgba(255,255,255,0.07); }
+    .admin-info { display: flex; align-items: center; gap: 10px; padding: 10px; }
+    .admin-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.85rem; color: var(--navy); flex-shrink: 0; }
+    .admin-name { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+    .admin-role { font-size: 0.7rem; color: rgba(255,255,255,0.3); }
+    .logout-btn { width: 100%; margin-top: 8px; padding: 9px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s, color 0.2s; }
+    .logout-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
+
+    /* MAIN */
+    .main { margin-left: 240px; flex: 1; padding: 32px 36px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .page-title { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+    .page-sub { font-size: 0.85rem; color: var(--text-light); margin-top: 3px; }
+
+    /* FILTERS */
+    .filters-bar { background: var(--white); border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 20px; margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .search-input { flex: 1; min-width: 200px; padding: 9px 14px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--text); outline: none; transition: border-color 0.2s; }
+    .search-input:focus { border-color: var(--green); }
+    .search-input::placeholder { color: var(--text-light); }
+    .filter-select { padding: 9px 14px; background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--text); outline: none; cursor: pointer; transition: border-color 0.2s; }
+    .filter-select:focus { border-color: var(--green); }
+    .filter-count { font-size: 0.8rem; color: var(--text-light); margin-left: auto; white-space: nowrap; }
+
+    /* TABLE */
+    .table-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--cream); }
+    th { padding: 12px 16px; text-align: left; font-family: 'Outfit', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); border-bottom: 1.5px solid var(--border); white-space: nowrap; }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--cream); }
+    tr { cursor: pointer; transition: background 0.15s; }
+
+    .td-id { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-light); }
+    .td-type { font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--text); }
+    .td-desc { font-size: 0.78rem; color: var(--text-light); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .td-loc { font-size: 0.78rem; color: var(--text-mid); max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .td-date { font-size: 0.78rem; color: var(--text-light); white-space: nowrap; }
+
+    .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; }
+    .s-submitted { background: #f0f0f0; color: #555; }
+    .s-under-review { background: #e8f0ff; color: #2563eb; }
+    .s-in-progress { background: #fff4e6; color: #c87c00; }
+    .s-resolved { background: var(--green-soft); color: var(--green-dark); }
+    .s-rejected { background: #ffeaea; color: #c0392b; }
+
+    .priority-badge { padding: 3px 9px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; }
+    .p-critical { background: #ffeaea; color: #e74c3c; }
+    .p-high { background: #fff4e6; color: #e67e22; }
+    .p-medium { background: #fff9e6; color: #f39c12; }
+    .p-low { background: var(--green-soft); color: var(--green-dark); }
+
+    .sdg-tag { padding: 2px 7px; background: var(--green-soft); border: 1px solid var(--green-mid); border-radius: 20px; font-size: 0.62rem; font-weight: 600; color: var(--green-dark); margin-right: 3px; }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: 18px; width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; padding: 32px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+    .modal-title { font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--text); }
+    .modal-id { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-light); margin-top: 3px; }
+    .close-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--cream); border: none; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .close-btn:hover { background: var(--border); }
+
+    .modal-section { margin-bottom: 20px; }
+    .modal-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 8px; font-family: 'Outfit', sans-serif; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-item { background: var(--cream); border-radius: 9px; padding: 12px 14px; }
+    .modal-item-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--text-light); margin-bottom: 4px; }
+    .modal-item-value { font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--text); }
+    .formal-box { background: var(--cream); border-left: 3px solid var(--green); border-radius: 0 9px 9px 0; padding: 12px 14px; font-size: 0.83rem; color: var(--text-mid); line-height: 1.65; }
+    .raw-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.65; }
+    .sdg-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+    .sdg-tag-lg { padding: 5px 12px; background: var(--green-soft); border: 1px solid var(--green-mid); border-radius: 20px; font-size: 0.78rem; font-weight: 600; color: var(--green-dark); }
+
+    .update-section { background: var(--cream); border-radius: 12px; padding: 18px; margin-top: 20px; }
+    .update-title { font-family: 'Outfit', sans-serif; font-size: 0.875rem; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+    .update-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .update-select { flex: 1; padding: 10px 14px; background: var(--white); border: 1.5px solid var(--border); border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--text); outline: none; cursor: pointer; }
+    .update-select:focus { border-color: var(--green); }
+    .notes-input { width: 100%; padding: 10px 14px; background: var(--white); border: 1.5px solid var(--border); border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--text); outline: none; resize: vertical; min-height: 80px; transition: border-color 0.2s; }
+    .notes-input:focus { border-color: var(--green); }
+    .notes-input::placeholder { color: var(--text-light); }
+    .update-btn { padding: 11px 24px; background: var(--green); color: white; border: none; border-radius: 9px; font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .update-btn:hover { background: var(--green-dark); }
+    .update-btn:disabled { background: var(--border); color: var(--text-light); cursor: not-allowed; }
+
+    .success-toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; padding: 12px 20px; border-radius: 10px; font-size: 0.875rem; font-weight: 500; display: none; z-index: 500; }
+    .success-toast.show { display: block; }
+
+    /* EMPTY / SPINNER */
+    .spinner-wrap { text-align: center; padding: 40px; }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; margin: auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { text-align: center; padding: 40px; color: var(--text-light); font-size: 0.875rem; }
+
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 20px; } }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">📍</div>
+    <span class="logo-name">CivicPulse</span>
+  </div>
+  <div class="dept-tag">
+    <div class="dept-label">Department</div>
+    <div class="dept-name" id="sidebarDept">Loading...</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="complaints.html" class="nav-item active"><span class="nav-icon">📋</span> Complaints</a>
+    <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+    <a href="analytics.html" class="nav-item"><span class="nav-icon">📈</span> Analytics</a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="admin-info">
+      <div class="admin-avatar" id="sidebarInitial">A</div>
+      <div>
+        <div class="admin-name" id="sidebarName">Admin</div>
+        <div class="admin-role" id="sidebarRole">Authority</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">← Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Complaints</div>
+      <div class="page-sub">View, filter and update complaint status</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-bar">
+    <input type="text" class="search-input" placeholder="Search by ID, type, location..." id="searchInput" oninput="filterComplaints()" />
+    <select class="filter-select" id="statusFilter" onchange="filterComplaints()">
+      <option value="">All Status</option>
+      <option>Submitted</option>
+      <option>Under Review</option>
+      <option>In Progress</option>
+      <option>Resolved</option>
+      <option>Rejected</option>
+    </select>
+    <select class="filter-select" id="priorityFilter" onchange="filterComplaints()">
+      <option value="">All Priority</option>
+      <option>Critical</option>
+      <option>High</option>
+      <option>Medium</option>
+      <option>Low</option>
+    </select>
+    <span class="filter-count" id="filterCount">— complaints</span>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tracking ID</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Location</th>
+            <th>Priority</th>
+            <th>SDG</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="complaintsTable">
+          <tr><td colspan="8"><div class="spinner-wrap"><div class="spinner"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="mTitle">—</div>
+        <div class="modal-id" id="mId">—</div>
+      </div>
+      <button class="close-btn" onclick="closeModalDirect()">✕</button>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-label">Complaint Description</div>
+      <div class="raw-text" id="mRaw">—</div>
+    </div>
+
+    <div class="modal-grid modal-section">
+      <div class="modal-item">
+        <div class="modal-item-label">Priority</div>
+        <div class="modal-item-value" id="mPriority">—</div>
+      </div>
+      <div class="modal-item">
+        <div class="modal-item-label">Authority</div>
+        <div class="modal-item-value" id="mAuthority">—</div>
+      </div>
+      <div class="modal-item">
+        <div class="modal-item-label">Location</div>
+        <div class="modal-item-value" id="mLocation">—</div>
+      </div>
+      <div class="modal-item">
+        <div class="modal-item-label">Filed On</div>
+        <div class="modal-item-value" id="mDate">—</div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-label">SDG Goals</div>
+      <div class="sdg-tags" id="mSdg"></div>
+      <div style="font-size:0.8rem;color:var(--text-light);margin-top:8px;" id="mSdgMsg"></div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-label">AI Formal Complaint</div>
+      <div class="formal-box" id="mFormal">—</div>
+    </div>
+
+    <div class="update-section">
+      <div class="update-title">Update Complaint</div>
+      <div class="update-row">
+        <select class="update-select" id="updateStatus">
+          <option>Submitted</option>
+          <option>Under Review</option>
+          <option>In Progress</option>
+          <option>Resolved</option>
+          <option>Rejected</option>
+        </select>
+      </div>
+      <textarea class="notes-input" id="updateNotes" placeholder="Add notes for the citizen (optional)..."></textarea>
+      <div style="margin-top:10px;">
+        <button class="update-btn" id="updateBtn" onclick="updateComplaint()">Update Status</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="success-toast" id="toast"></div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('cp_token');
+  const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
+  if (!token || user.role !== 'admin') window.location.href = 'login.html';
+
+  document.getElementById('sidebarName').textContent = user.name || 'Admin';
+  document.getElementById('sidebarInitial').textContent = (user.name || 'A').charAt(0).toUpperCase();
+  document.getElementById('sidebarDept').textContent = user.department || 'Super Admin';
+  document.getElementById('sidebarRole').textContent = user.department ? `${user.department} Dept.` : 'All Departments';
+
+  const CATEGORY_ICONS = { roads: '🛣️', water: '💧', garbage: '🗑️', drainage: '🌊', electricity: '⚡', other: '📋', 'Roads & Infrastructure': '🛣️', 'Water Supply': '💧', 'Garbage & Waste': '🗑️', 'Drainage & Sewage': '🌊', 'Electricity & Streetlights': '⚡', 'Public Nuisance': '📋' };
+  const STATUS_CLASS = { 'Submitted': 's-submitted', 'Under Review': 's-under-review', 'In Progress': 's-in-progress', 'Resolved': 's-resolved', 'Rejected': 's-rejected' };
+  const PRIORITY_CLASS = { 'Critical': 'p-critical', 'High': 'p-high', 'Medium': 'p-medium', 'Low': 'p-low' };
+
+  let allComplaints = [];
+  let currentComplaint = null;
+
+  // Open from URL param
+  const urlParams = new URLSearchParams(window.location.search);
+  const openId = urlParams.get('id');
+
+  async function loadComplaints() {
+    try {
+      const res = await fetch(`${API}/admin/complaints`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error();
+      allComplaints = data.complaints || [];
+      filterComplaints();
+
+      if (openId) {
+        const c = allComplaints.find(c => c._id === openId);
+        if (c) openModal(c);
+      }
+    } catch {
+      document.getElementById('complaintsTable').innerHTML = '<tr><td colspan="8"><div class="empty">Could not load complaints. Make sure backend is running.</div></td></tr>';
+    }
+  }
+
+  function filterComplaints() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value;
+    const priority = document.getElementById('priorityFilter').value;
+
+    const filtered = allComplaints.filter(c => {
+      const matchSearch = !search ||
+        (c.trackingId || '').toLowerCase().includes(search) ||
+        (c.category || '').toLowerCase().includes(search) ||
+        (c.location?.address || '').toLowerCase().includes(search) ||
+        (c.rawText || '').toLowerCase().includes(search);
+      const matchStatus = !status || c.status === status;
+      const matchPriority = !priority || c.priority === priority;
+      return matchSearch && matchStatus && matchPriority;
+    });
+
+    document.getElementById('filterCount').textContent = `${filtered.length} complaint${filtered.length !== 1 ? 's' : ''}`;
+    renderTable(filtered);
+  }
+
+  function renderTable(complaints) {
+    if (!complaints.length) {
+      document.getElementById('complaintsTable').innerHTML = '<tr><td colspan="8"><div class="empty">No complaints found.</div></td></tr>';
+      return;
+    }
+    document.getElementById('complaintsTable').innerHTML = complaints.map(c => `
+      <tr onclick="openModal(${JSON.stringify(c).replace(/"/g, '&quot;')})">
+        <td><span class="td-id">${c.trackingId}</span></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:7px;">
+            <span>${CATEGORY_ICONS[c.category] || '📋'}</span>
+            <span class="td-type">${c.category || '—'}</span>
+          </div>
+        </td>
+        <td><span class="td-desc">${c.rawText || '—'}</span></td>
+        <td><span class="td-loc">${c.location?.address ? c.location.address.split(',')[0] : '—'}</span></td>
+        <td><span class="priority-badge ${PRIORITY_CLASS[c.priority] || 'p-medium'}">${c.priority || '—'}</span></td>
+        <td>${(c.sdgTags || []).map(t => `<span class="sdg-tag">${t}</span>`).join('')}</td>
+        <td><span class="status-pill ${STATUS_CLASS[c.status] || 's-submitted'}">${c.status}</span></td>
+        <td><span class="td-date">${new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span></td>
+      </tr>`).join('');
+  }
+
+  function openModal(c) {
+    currentComplaint = c;
+    document.getElementById('mTitle').textContent = c.category || 'Civic Issue';
+    document.getElementById('mId').textContent = c.trackingId;
+    document.getElementById('mRaw').textContent = c.rawText || '—';
+    document.getElementById('mPriority').textContent = c.priority || '—';
+    document.getElementById('mAuthority').textContent = c.authority || '—';
+    document.getElementById('mLocation').textContent = c.location?.address ? c.location.address.split(',')[0] : '—';
+    document.getElementById('mDate').textContent = new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('mFormal').textContent = c.formalComplaint || '—';
+    document.getElementById('mSdgMsg').textContent = c.sdgMessage || '';
+
+    const sdgContainer = document.getElementById('mSdg');
+    sdgContainer.innerHTML = (c.sdgTags || []).map(t => `<span class="sdg-tag-lg">${t}</span>`).join('');
+
+    document.getElementById('updateStatus').value = c.status;
+    document.getElementById('updateNotes').value = c.adminNotes || '';
+
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+  }
+
+  function closeModalDirect() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    currentComplaint = null;
+  }
+
+  async function updateComplaint() {
+    if (!currentComplaint) return;
+    const status = document.getElementById('updateStatus').value;
+    const adminNotes = document.getElementById('updateNotes').value;
+
+    document.getElementById('updateBtn').disabled = true;
+    try {
+      const res = await fetch(`${API}/admin/complaints/${currentComplaint._id}`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, adminNotes })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      // Update local data
+      const idx = allComplaints.findIndex(c => c._id === currentComplaint._id);
+      if (idx > -1) { allComplaints[idx].status = status; allComplaints[idx].adminNotes = adminNotes; }
+
+      showToast(`✅ Status updated to "${status}"`);
+      closeModalDirect();
+      filterComplaints();
+    } catch (err) {
+      showToast(`❌ ${err.message || 'Update failed'}`);
+    } finally {
+      document.getElementById('updateBtn').disabled = false;
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function logout() {
+    localStorage.removeItem('cp_token');
+    localStorage.removeItem('cp_user');
+    window.location.href = 'login.html';
+  }
+
+  loadComplaints();
+</script>
+</body>
+</html>
