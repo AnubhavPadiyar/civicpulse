@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CivicPulse — Map View</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #2ECC71; --green-dark: #25a85c; --green-soft: #e8f8ef; --green-mid: #c5edd6;
+      --cream: #F5F0E8; --white: #ffffff; --text: #1f2d1f; --text-mid: #4a5e4a;
+      --text-light: #7a907a; --border: #dde8dd; --navy: #1f2d1f; --sidebar: #16231a;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; display: flex; }
+    a { text-decoration: none; }
+
+    /* SIDEBAR */
+    .sidebar { width: 240px; background: var(--sidebar); min-height: 100vh; display: flex; flex-direction: column; padding: 24px 0; position: fixed; top: 0; left: 0; z-index: 100; }
+    .sidebar-logo { display: flex; align-items: center; gap: 9px; padding: 0 20px 28px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 20px; }
+    .logo-mark { width: 32px; height: 32px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .logo-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; color: white; }
+    .dept-tag { margin: 0 16px 20px; background: rgba(46,204,113,0.12); border: 1px solid rgba(46,204,113,0.2); border-radius: 8px; padding: 8px 12px; }
+    .dept-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.35); margin-bottom: 3px; }
+    .dept-name { font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--green); }
+    .nav-section { padding: 0 12px; margin-bottom: 6px; }
+    .nav-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.25); padding: 0 8px; margin-bottom: 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 9px; color: rgba(255,255,255,0.5); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+    .nav-item.active { background: rgba(46,204,113,0.15); color: var(--green); }
+    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-bottom { margin-top: auto; padding: 16px 12px 0; border-top: 1px solid rgba(255,255,255,0.07); }
+    .admin-info { display: flex; align-items: center; gap: 10px; padding: 10px; }
+    .admin-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.85rem; color: var(--navy); flex-shrink: 0; }
+    .admin-name { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+    .admin-role { font-size: 0.7rem; color: rgba(255,255,255,0.3); }
+    .logout-btn { width: 100%; margin-top: 8px; padding: 9px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s, color 0.2s; }
+    .logout-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
+
+    /* MAIN */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .topbar { padding: 20px 28px; background: var(--white); border-bottom: 1.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; flex-shrink: 0; }
+    .page-title { font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+    .page-sub { font-size: 0.82rem; color: var(--text-light); margin-top: 2px; }
+    .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--text-mid); transition: all 0.15s; }
+    .pill-btn:hover { border-color: var(--green); color: var(--text); }
+    .pill-btn.active { border-color: var(--green); background: var(--green-soft); color: var(--green-dark); }
+    .pill-btn.p-critical.active { border-color: #e74c3c; background: #ffeaea; color: #e74c3c; }
+    .pill-btn.p-high.active { border-color: #e67e22; background: #fff4e6; color: #e67e22; }
+    .pill-btn.p-medium.active { border-color: #f39c12; background: #fff9e6; color: #f39c12; }
+
+    /* MAP */
+    .map-wrap { flex: 1; position: relative; }
+    #map { width: 100%; height: 100%; }
+
+    /* POPUP OVERRIDE */
+    .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); border: 1.5px solid var(--border); padding: 0; overflow: hidden; }
+    .leaflet-popup-content { margin: 0; }
+    .popup-card { padding: 14px 16px; min-width: 220px; }
+    .popup-id { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text-light); margin-bottom: 4px; }
+    .popup-type { font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    .popup-desc { font-size: 0.78rem; color: var(--text-mid); line-height: 1.5; margin-bottom: 10px; }
+    .popup-footer { display: flex; justify-content: space-between; align-items: center; }
+    .popup-status { padding: 3px 9px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; }
+    .popup-priority { font-size: 0.72rem; font-weight: 700; }
+    .p-c { color: #e74c3c; } .p-h { color: #e67e22; } .p-m { color: #f39c12; } .p-l { color: var(--green-dark); }
+    .s-sub { background: #f0f0f0; color: #555; }
+    .s-rev { background: #e8f0ff; color: #2563eb; }
+    .s-prog { background: #fff4e6; color: #c87c00; }
+    .s-res { background: var(--green-soft); color: var(--green-dark); }
+    .popup-sdg { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
+    .popup-sdg-tag { padding: 2px 7px; background: var(--green-soft); border: 1px solid var(--green-mid); border-radius: 20px; font-size: 0.62rem; font-weight: 600; color: var(--green-dark); }
+
+    /* LEGEND */
+    .legend { position: absolute; bottom: 24px; right: 16px; background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; z-index: 999; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .legend-title { font-family: 'Outfit', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 0.78rem; color: var(--text-mid); }
+    .legend-item:last-child { margin-bottom: 0; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+    /* COUNTER */
+    .map-counter { position: absolute; top: 16px; right: 16px; background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 16px; z-index: 999; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .counter-num { font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text); line-height: 1; }
+    .counter-label { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; }
+
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; } }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">📍</div>
+    <span class="logo-name">CivicPulse</span>
+  </div>
+  <div class="dept-tag">
+    <div class="dept-label">Department</div>
+    <div class="dept-name" id="sidebarDept">Loading...</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="complaints.html" class="nav-item"><span class="nav-icon">📋</span> Complaints</a>
+    <a href="map.html" class="nav-item active"><span class="nav-icon">🗺️</span> Map View</a>
+    <a href="analytics.html" class="nav-item"><span class="nav-icon">📈</span> Analytics</a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="admin-info">
+      <div class="admin-avatar" id="sidebarInitial">A</div>
+      <div>
+        <div class="admin-name" id="sidebarName">Admin</div>
+        <div class="admin-role" id="sidebarRole">Authority</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">← Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Map View</div>
+      <div class="page-sub">Geographic view of all complaints in your jurisdiction</div>
+    </div>
+    <div class="filter-pills">
+      <button class="pill-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
+      <button class="pill-btn p-critical" data-filter="Critical" onclick="setFilter('Critical', this)">🔴 Critical</button>
+      <button class="pill-btn p-high" data-filter="High" onclick="setFilter('High', this)">🟠 High</button>
+      <button class="pill-btn p-medium" data-filter="Medium" onclick="setFilter('Medium', this)">🟡 Medium</button>
+      <button class="pill-btn" data-filter="Resolved" onclick="setFilter('Resolved', this)">✅ Resolved</button>
+    </div>
+  </div>
+
+  <div class="map-wrap">
+    <div id="map"></div>
+
+    <div class="map-counter">
+      <div class="counter-num" id="markerCount">0</div>
+      <div class="counter-label">complaints shown</div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-title">Priority</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e74c3c"></div> Critical</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div> High</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f39c12"></div> Medium</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2ECC71"></div> Low / Resolved</div>
+    </div>
+  </div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('cp_token');
+  const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
+  if (!token || user.role !== 'admin') window.location.href = 'login.html';
+
+  document.getElementById('sidebarName').textContent = user.name || 'Admin';
+  document.getElementById('sidebarInitial').textContent = (user.name || 'A').charAt(0).toUpperCase();
+  document.getElementById('sidebarDept').textContent = user.department || 'Super Admin';
+  document.getElementById('sidebarRole').textContent = user.department ? `${user.department} Dept.` : 'All Departments';
+
+  const PRIORITY_COLORS = { Critical: '#e74c3c', High: '#e67e22', Medium: '#f39c12', Low: '#2ECC71' };
+  const STATUS_CLASS = { 'Submitted': 's-sub', 'Under Review': 's-rev', 'In Progress': 's-prog', 'Resolved': 's-res' };
+  const PRIORITY_CLASS = { 'Critical': 'p-c', 'High': 'p-h', 'Medium': 'p-m', 'Low': 'p-l' };
+
+  let map, allComplaints = [], markers = [], currentFilter = 'all';
+
+  window.addEventListener('load', () => {
+    map = L.map('map').setView([30.3165, 78.0322], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+    loadComplaints();
+  });
+
+  async function loadComplaints() {
+    try {
+      const res = await fetch(`${API}/admin/complaints`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      allComplaints = (data.complaints || []).filter(c => c.location?.lat && c.location?.lng);
+      renderMarkers();
+    } catch {
+      console.error('Could not load complaints');
+    }
+  }
+
+  function renderMarkers() {
+    // Clear existing
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    const filtered = currentFilter === 'all'
+      ? allComplaints
+      : currentFilter === 'Resolved'
+        ? allComplaints.filter(c => c.status === 'Resolved')
+        : allComplaints.filter(c => c.priority === currentFilter);
+
+    document.getElementById('markerCount').textContent = filtered.length;
+
+    filtered.forEach(c => {
+      const color = c.status === 'Resolved' ? '#2ECC71' : (PRIORITY_COLORS[c.priority] || '#7a907a');
+
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:14px;height:14px;background:${color};border:2.5px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.25);"></div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+      });
+
+      const popupHtml = `
+        <div class="popup-card">
+          <div class="popup-id">${c.trackingId}</div>
+          <div class="popup-type">${c.category || 'Civic Issue'}</div>
+          <div class="popup-desc">${(c.rawText || '').slice(0, 100)}${c.rawText?.length > 100 ? '...' : ''}</div>
+          <div class="popup-footer">
+            <span class="popup-status ${STATUS_CLASS[c.status] || 's-sub'}">${c.status}</span>
+            <span class="popup-priority ${PRIORITY_CLASS[c.priority] || 'p-m'}">${c.priority}</span>
+          </div>
+          ${c.sdgTags?.length ? `<div class="popup-sdg">${c.sdgTags.map(t => `<span class="popup-sdg-tag">${t}</span>`).join('')}</div>` : ''}
+        </div>`;
+
+      const m = L.marker([c.location.lat, c.location.lng], { icon })
+        .addTo(map)
+        .bindPopup(popupHtml, { maxWidth: 260 });
+
+      markers.push(m);
+    });
+
+    // Fit bounds if markers exist
+    if (markers.length > 0) {
+      const group = L.featureGroup(markers);
+      map.fitBounds(group.getBounds().pad(0.1));
+    }
+  }
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderMarkers();
+  }
+
+  function logout() {
+    localStorage.removeItem('cp_token');
+    localStorage.removeItem('cp_user');
+    window.location.href = 'login.html';
+  }
+</script>
+</body>
+</html>

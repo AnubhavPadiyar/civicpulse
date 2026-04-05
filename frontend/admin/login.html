@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CivicPulse — Admin Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #2ECC71; --green-dark: #25a85c; --green-soft: #e8f8ef; --green-mid: #c5edd6;
+      --cream: #F5F0E8; --white: #ffffff; --text: #1f2d1f; --text-mid: #4a5e4a;
+      --text-light: #7a907a; --border: #dde8dd; --navy: #1f2d1f;
+      --error: #e74c3c; --error-soft: #ffeaea;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+
+    .login-wrap {
+      width: 100%; max-width: 420px;
+      background: var(--white); border-radius: 20px;
+      padding: 40px 36px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+    }
+
+    .logo { display: flex; align-items: center; gap: 9px; justify-content: center; margin-bottom: 28px; }
+    .logo-mark { width: 38px; height: 38px; background: var(--green); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .logo-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--text); }
+
+    .admin-tag {
+      display: block; text-align: center;
+      background: rgba(27,43,75,0.07); color: var(--text-mid);
+      border-radius: 20px; padding: 4px 14px; font-size: 0.75rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+      margin-bottom: 28px;
+    }
+
+    .form-title { font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 6px; letter-spacing: -0.3px; }
+    .form-sub { font-size: 0.85rem; color: var(--text-light); margin-bottom: 24px; }
+
+    .alert { padding: 11px 14px; border-radius: 9px; font-size: 0.83rem; font-weight: 500; display: none; margin-bottom: 16px; }
+    .alert.show { display: block; }
+    .alert.error { background: var(--error-soft); color: var(--error); border: 1px solid #ffc9c9; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field label { font-size: 0.8rem; font-weight: 600; color: var(--text-mid); font-family: 'Outfit', sans-serif; }
+    .field input {
+      padding: 11px 14px; background: var(--cream); border: 1.5px solid var(--border);
+      border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      color: var(--text); outline: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .field input:focus { border-color: var(--green); background: white; }
+    .field input::placeholder { color: var(--text-light); }
+
+    .submit-btn {
+      width: 100%; padding: 13px; background: var(--navy); color: white; border: none;
+      border-radius: 9px; font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s; margin-top: 6px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .submit-btn:hover { background: #2d3f2d; }
+    .submit-btn:disabled { background: var(--border); color: var(--text-light); cursor: not-allowed; }
+
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .back-link { display: block; text-align: center; margin-top: 20px; font-size: 0.82rem; color: rgba(255,255,255,0.4); transition: color 0.2s; }
+    .back-link:hover { color: rgba(255,255,255,0.7); }
+  </style>
+</head>
+<body>
+
+  <div class="login-wrap">
+    <div class="logo">
+      <div class="logo-mark">📍</div>
+      <span class="logo-name">CivicPulse</span>
+    </div>
+
+    <span class="admin-tag">🔐 Admin Portal</span>
+
+    <div class="form-title">Authority Login</div>
+    <div class="form-sub">Access the admin dashboard to manage complaints</div>
+
+    <div id="loginAlert" class="alert error"></div>
+
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="admin@civicpulse.in" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Enter admin password" />
+    </div>
+
+    <button class="submit-btn" id="loginBtn" onclick="handleLogin()">
+      <span id="btnText">Login to Dashboard</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </div>
+
+  <a href="../../frontend/user/index.html" class="back-link">← Back to CivicPulse</a>
+
+<script>
+  const API = 'http://localhost:5000/api';
+
+  // If already logged in as admin, redirect
+  const token = localStorage.getItem('cp_token');
+  const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
+  if (token && user.role === 'admin') window.location.href = 'dashboard.html';
+
+  async function handleLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (!email || !password) return showAlert('Please fill in all fields.');
+
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Login failed');
+      if (data.user.role !== 'admin') throw new Error('Access denied. Admin only.');
+
+      localStorage.setItem('cp_token', data.token);
+      localStorage.setItem('cp_user', JSON.stringify(data.user));
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      showAlert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function showAlert(msg) {
+    const el = document.getElementById('loginAlert');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  function setLoading(on) {
+    document.getElementById('loginBtn').disabled = on;
+    document.getElementById('btnText').style.display = on ? 'none' : 'inline';
+    document.getElementById('spinner').style.display = on ? 'block' : 'none';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+</script>
+</body>
+</html>

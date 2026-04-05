@@ -404,20 +404,19 @@
     document.getElementById('submitSpinner').style.display = 'block';
 
     try {
-      const formData = new FormData();
-      formData.append('rawText', text);
-      formData.append('category', selectedCat);
-      formData.append('locationAddress', locationData.address);
-      formData.append('locationLat', locationData.lat || '');
-      formData.append('locationLng', locationData.lng || '');
-
-      const photoInput = document.getElementById('photoInput');
-      if (photoInput.files[0]) formData.append('image', photoInput.files[0]);
-
       const res = await fetch(`${API}/complaints`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          rawText: text,
+          category: selectedCat,
+          locationAddress: locationData.address,
+          locationLat: locationData.lat || '',
+          locationLng: locationData.lng || ''
+        })
       });
 
       const data = await res.json();
