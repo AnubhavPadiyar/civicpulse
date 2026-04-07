@@ -1,490 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CivicPulse — Report an Issue</title>
+  <title>CivicPulse — Login</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --green: #2ECC71; --green-dark: #25a85c; --green-soft: #e8f8ef; --green-mid: #c5edd6;
-      --cream: #F5F0E8; --white: #ffffff; --text: #1f2d1f; --text-mid: #4a5e4a;
-      --text-light: #7a907a; --border: #dde8dd; --navy: #1f2d1f;
-      --error: #e74c3c; --error-soft: #ffeaea;
+      --blue: #2C5AA0; --blue-dark: #1e3f72; --blue-light: #C1E4F9; --blue-soft: #EBF4FD;
+      --teal: #00A8A8; --bg: #F5F7FA; --white: #ffffff;
+      --text: #222222; --text-mid: #4A5568; --text-light: #8896A5;
+      --border: #E2E8F0; --error: #C0392B; --error-soft: #FFF0F0;
     }
-    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
-    a { text-decoration: none; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { text-decoration: none; color: inherit; }
 
     /* NAV */
-    nav { background: var(--white); border-bottom: 1.5px solid var(--border); position: sticky; top: 0; z-index: 200; }
-    .nav-inner { padding: 0 5%; height: 62px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { display: flex; align-items: center; gap: 9px; }
-    .logo-mark { width: 34px; height: 34px; background: var(--green); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-    .logo-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--text); }
-    .nav-user { display: flex; align-items: center; gap: 12px; }
-    .nav-username { font-size: 0.875rem; color: var(--text-mid); font-weight: 500; }
-    .nav-links-right { display: flex; gap: 8px; }
-    .btn-sm-ghost { padding: 6px 14px; border: 1.5px solid var(--border); background: transparent; color: var(--text-mid); border-radius: 7px; font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
-    .btn-sm-ghost:hover { border-color: var(--green); color: var(--text); }
-
-    /* LAYOUT */
-    .page { max-width: 860px; margin: auto; padding: 44px 5% 80px; }
-
-    .page-header { margin-bottom: 32px; }
-    .page-title { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 6px; }
-    .page-sub { font-size: 0.9rem; color: var(--text-light); }
-
-    /* CARD */
-    .card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 16px; }
-    .card-title { font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); margin-bottom: 18px; }
-
-    /* CATEGORIES */
-    .cats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .cat-btn {
-      padding: 14px 10px; background: var(--cream); border: 1.5px solid var(--border);
-      border-radius: 11px; display: flex; flex-direction: column; align-items: center; gap: 7px;
-      cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+    nav { background: var(--white); border-bottom: 1px solid var(--border); }
+    .nav-inner {
+      padding: 0 5%; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .cat-btn:hover { border-color: var(--green); background: var(--green-soft); }
-    .cat-btn.selected { border-color: var(--green); background: var(--green-soft); }
-    .cat-btn .emoji { font-size: 1.4rem; }
-    .cat-btn .label { font-size: 0.75rem; font-weight: 600; color: var(--text-mid); text-align: center; line-height: 1.3; }
-
-    /* TEXTAREA */
-    .complaint-textarea {
-      width: 100%; padding: 14px; background: var(--cream);
-      border: 1.5px solid var(--border); border-radius: 11px;
-      font-family: 'DM Sans', sans-serif; font-size: 0.93rem; color: var(--text);
-      resize: vertical; min-height: 120px; outline: none; transition: border-color 0.2s, background 0.2s;
-      line-height: 1.6;
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon {
+      width: 36px; height: 36px; background: var(--blue); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 0.75rem; color: white;
     }
-    .complaint-textarea:focus { border-color: var(--green); background: var(--white); }
-    .complaint-textarea::placeholder { color: var(--text-light); }
-    .char-count { text-align: right; font-size: 0.75rem; color: var(--text-light); margin-top: 6px; }
+    .logo-name { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--text); }
+    .logo-name span { color: var(--blue); }
+    .nav-back { font-size: 0.85rem; color: var(--text-light); transition: color 0.15s; }
+    .nav-back:hover { color: var(--blue); }
 
-    /* PHOTO UPLOAD */
-    .upload-area {
-      border: 2px dashed var(--border); border-radius: 11px; padding: 28px;
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
-      cursor: pointer; transition: border-color 0.2s, background 0.2s; background: var(--cream);
+    /* MAIN */
+    .main {
+      flex: 1; display: flex; align-items: center;
+      justify-content: center; padding: 48px 20px;
     }
-    .upload-area:hover { border-color: var(--green); background: var(--green-soft); }
-    .upload-area.has-file { border-color: var(--green); background: var(--green-soft); border-style: solid; }
-    .upload-icon { font-size: 1.8rem; }
-    .upload-text { font-size: 0.85rem; color: var(--text-mid); font-weight: 500; }
-    .upload-sub { font-size: 0.75rem; color: var(--text-light); }
-    #photoInput { display: none; }
-    .photo-preview { width: 100%; border-radius: 9px; max-height: 200px; object-fit: cover; display: none; }
 
-    /* MAP */
-    #map { height: 220px; border-radius: 11px; border: 1.5px solid var(--border); overflow: hidden; }
-    .location-input {
-      width: 100%; padding: 11px 14px; background: var(--cream); border: 1.5px solid var(--border);
-      border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text);
-      outline: none; transition: border-color 0.2s; margin-top: 12px;
+    .auth-wrap {
+      width: 100%; max-width: 920px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      background: var(--white); border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(44,90,160,0.08);
+      overflow: hidden;
     }
-    .location-input:focus { border-color: var(--green); background: var(--white); }
-    .location-input::placeholder { color: var(--text-light); }
-    .locate-btn {
-      margin-top: 10px; padding: 9px 16px; background: transparent; border: 1.5px solid var(--border);
-      border-radius: 8px; font-size: 0.82rem; font-weight: 500; color: var(--text-mid);
-      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .locate-btn:hover { border-color: var(--green); color: var(--text); }
 
-    /* SUBMIT */
+    /* LEFT */
+    .auth-left {
+      background: var(--blue); padding: 52px 44px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: relative; overflow: hidden;
+    }
+
+    .auth-left::before {
+      content: '';
+      position: absolute; top: -80px; right: -80px;
+      width: 280px; height: 280px;
+      background: rgba(255,255,255,0.05); border-radius: 50%;
+    }
+
+    .auth-left::after {
+      content: '';
+      position: absolute; bottom: -60px; left: -40px;
+      width: 200px; height: 200px;
+      background: rgba(0,168,168,0.1); border-radius: 50%;
+    }
+
+    .left-top { position: relative; z-index: 1; }
+
+    .left-tag {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.9); padding: 5px 12px; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 600; margin-bottom: 28px;
+    }
+
+    .tag-dot { width: 6px; height: 6px; background: var(--teal); border-radius: 50%; }
+
+    .auth-left h2 {
+      font-family: 'Sora', sans-serif; font-size: 1.9rem;
+      font-weight: 800; color: white; line-height: 1.2;
+      letter-spacing: -0.5px; margin-bottom: 14px;
+    }
+
+    .auth-left h2 span { color: var(--teal); }
+
+    .auth-left p { color: rgba(255,255,255,0.5); font-size: 0.9rem; line-height: 1.65; }
+
+    .left-stats { display: flex; gap: 28px; position: relative; z-index: 1; }
+    .ls { display: flex; flex-direction: column; gap: 3px; }
+    .ls-num { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 800; color: white; }
+    .ls-num span { color: var(--teal); }
+    .ls-label { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+
+    /* RIGHT */
+    .auth-right { padding: 52px 44px; }
+
+    .tabs {
+      display: flex; background: var(--bg); border-radius: 10px;
+      padding: 4px; margin-bottom: 32px;
+    }
+
+    .tab {
+      flex: 1; padding: 9px; text-align: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.875rem; font-weight: 600;
+      color: var(--text-light); border-radius: 7px;
+      cursor: pointer; border: none; background: transparent;
+      transition: background 0.15s, color 0.15s;
+    }
+    .tab.active { background: var(--white); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+    .form { display: none; flex-direction: column; gap: 14px; }
+    .form.active { display: flex; }
+
+    .form-title { font-family: 'Sora', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+    .form-sub { font-size: 0.85rem; color: var(--text-light); margin-bottom: 4px; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 0.8rem; font-weight: 600; color: var(--text-mid); }
+    .field input {
+      padding: 11px 14px; background: var(--bg);
+      border: 1.5px solid var(--border); border-radius: 9px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem; color: var(--text); outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .field input:focus { border-color: var(--blue); background: var(--white); }
+    .field input::placeholder { color: var(--text-light); }
+
     .submit-btn {
-      width: 100%; padding: 14px; background: var(--green); color: white; border: none;
-      border-radius: 11px; font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700;
-      cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 13px; background: var(--blue); color: white;
+      border: none; border-radius: 9px;
+      font-family: 'Sora', sans-serif; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; margin-top: 4px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background 0.15s;
+      box-shadow: 0 2px 10px rgba(44,90,160,0.25);
     }
-    .submit-btn:hover { background: var(--green-dark); }
-    .submit-btn:disabled { background: var(--border); color: var(--text-light); cursor: not-allowed; }
+    .submit-btn:hover { background: var(--blue-dark); }
+    .submit-btn:disabled { background: var(--border); color: var(--text-light); cursor: not-allowed; box-shadow: none; }
 
-    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* AI RESULT */
-    .ai-result { display: none; }
-    .ai-result.show { display: block; }
+    .switch-text { text-align: center; font-size: 0.83rem; color: var(--text-light); }
+    .switch-text a { color: var(--blue); font-weight: 600; }
+    .switch-text a:hover { text-decoration: underline; }
 
-    .result-card {
-      background: var(--white); border: 1.5px solid var(--green-mid); border-radius: 16px;
-      padding: 28px; margin-bottom: 16px;
-    }
+    .alert { padding: 11px 14px; border-radius: 9px; font-size: 0.83rem; font-weight: 500; display: none; }
+    .alert.show { display: block; }
+    .alert.success { background: #E8FBF5; color: #1A7A50; border: 1px solid #B8F0DA; }
+    .alert.error { background: var(--error-soft); color: var(--error); border: 1px solid #FCCACA; }
 
-    .result-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-    .result-icon { width: 44px; height: 44px; background: var(--green-soft); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
-    .result-title { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--text); }
-    .result-sub { font-size: 0.8rem; color: var(--text-light); }
-
-    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-    .result-item { background: var(--cream); border-radius: 10px; padding: 14px; }
-    .result-item-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 5px; }
-    .result-item-value { font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--text); }
-
-    .priority-critical { color: #e74c3c; }
-    .priority-high { color: #e67e22; }
-    .priority-medium { color: #f39c12; }
-    .priority-low { color: var(--green-dark); }
-
-    .sdg-tags { display: flex; flex-wrap: wrap; gap: 7px; }
-    .sdg-tag { padding: 4px 11px; background: var(--green-soft); border: 1px solid var(--green-mid); border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--green-dark); }
-
-    .formal-box { background: var(--cream); border-left: 3px solid var(--green); border-radius: 0 9px 9px 0; padding: 14px 16px; font-size: 0.85rem; color: var(--text-mid); line-height: 1.65; }
-
-    .tracking-id-box {
-      background: var(--navy); border-radius: 11px; padding: 20px 24px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-    }
-    .tracking-label { font-size: 0.75rem; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .tracking-id { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; color: var(--green); font-weight: 600; }
-    .track-now-btn {
-      padding: 10px 20px; background: var(--green); color: white; border: none; border-radius: 8px;
-      font-family: 'Outfit', sans-serif; font-size: 0.875rem; font-weight: 700; cursor: pointer;
-      transition: background 0.2s;
-    }
-    .track-now-btn:hover { background: var(--green-dark); }
-
-    .new-report-btn {
-      width: 100%; padding: 13px; background: transparent; border: 1.5px solid var(--border);
-      border-radius: 11px; font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 600;
-      color: var(--text-mid); cursor: pointer; transition: border-color 0.2s;
-    }
-    .new-report-btn:hover { border-color: var(--green); color: var(--text); }
-
-    .section-gap { margin-bottom: 12px; }
-
-    @media (max-width: 600px) {
-      .cats-grid { grid-template-columns: repeat(2, 1fr); }
-      .result-grid { grid-template-columns: 1fr; }
+    @media (max-width: 700px) {
+      .auth-wrap { grid-template-columns: 1fr; }
+      .auth-left { display: none; }
+      .auth-right { padding: 36px 24px; }
     }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="nav-inner">
     <a href="index.html" class="logo">
-      <div class="logo-mark">📍</div>
-      <span class="logo-name">CivicPulse</span>
+      <div class="logo-icon">CP</div>
+      <span class="logo-name">Civic<span>Pulse</span></span>
     </a>
-    <div class="nav-user">
-      <span class="nav-username" id="navUsername"></span>
-      <div class="nav-links-right">
-        <a href="profile.html" class="btn-sm-ghost">My Profile</a>
-        <button class="btn-sm-ghost" onclick="logout()">Logout</button>
-      </div>
-    </div>
+    <a href="index.html" class="nav-back">← Back to Home</a>
   </div>
 </nav>
 
-<!-- FORM VIEW -->
-<div class="page" id="formView">
-  <div class="page-header">
-    <div class="page-title">Report an Issue</div>
-    <div class="page-sub">Describe what you see — our AI will handle the rest</div>
-  </div>
+<div class="main">
+  <div class="auth-wrap">
 
-  <!-- CATEGORY -->
-  <div class="card">
-    <div class="card-title">Select Category</div>
-    <div class="cats-grid">
-      <button class="cat-btn" data-cat="roads" onclick="selectCat(this)">
-        <span class="emoji">🛣️</span><span class="label">Roads & Infrastructure</span>
-      </button>
-      <button class="cat-btn" data-cat="water" onclick="selectCat(this)">
-        <span class="emoji">💧</span><span class="label">Water Supply</span>
-      </button>
-      <button class="cat-btn" data-cat="garbage" onclick="selectCat(this)">
-        <span class="emoji">🗑️</span><span class="label">Garbage & Waste</span>
-      </button>
-      <button class="cat-btn" data-cat="drainage" onclick="selectCat(this)">
-        <span class="emoji">🌊</span><span class="label">Drainage & Sewage</span>
-      </button>
-      <button class="cat-btn" data-cat="electricity" onclick="selectCat(this)">
-        <span class="emoji">⚡</span><span class="label">Electricity & Streetlights</span>
-      </button>
-      <button class="cat-btn" data-cat="other" onclick="selectCat(this)">
-        <span class="emoji">📋</span><span class="label">Public Nuisance</span>
-      </button>
+    <!-- LEFT -->
+    <div class="auth-left">
+      <div class="left-top">
+        <div class="left-tag"><div class="tag-dot"></div> AI-Powered Platform</div>
+        <h2>Your city.<br/>Your voice.<br/><span>Real action.</span></h2>
+        <p>Report civic issues in seconds. Our AI routes your complaint to the right authority automatically.</p>
+      </div>
+      <div class="left-stats">
+        <div class="ls"><span class="ls-num">2.4<span>K</span></span><span class="ls-label">Complaints Filed</span></div>
+        <div class="ls"><span class="ls-num">87<span>%</span></span><span class="ls-label">Resolution Rate</span></div>
+        <div class="ls"><span class="ls-num">48<span>h</span></span><span class="ls-label">Avg. Response</span></div>
+      </div>
     </div>
-  </div>
 
-  <!-- DESCRIPTION -->
-  <div class="card">
-    <div class="card-title">Describe the Issue</div>
-    <textarea class="complaint-textarea" id="complaintText" placeholder="e.g. There is a large garbage pile near the main market gate that hasn't been collected for 4 days. It's blocking the footpath and causing a bad smell..." oninput="updateCharCount()"></textarea>
-    <div class="char-count"><span id="charCount">0</span> / 500</div>
-  </div>
+    <!-- RIGHT -->
+    <div class="auth-right">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('login')">Login</button>
+        <button class="tab" onclick="switchTab('register')">Register</button>
+      </div>
 
-  <!-- PHOTO -->
-  <div class="card">
-    <div class="card-title">Add Photo <span style="color:var(--text-light);font-weight:400;text-transform:none;font-size:0.75rem;">(optional)</span></div>
-    <div class="upload-area" id="uploadArea" onclick="document.getElementById('photoInput').click()">
-      <span class="upload-icon">📷</span>
-      <span class="upload-text">Click to upload a photo</span>
-      <span class="upload-sub">JPG, PNG up to 5MB</span>
+      <!-- LOGIN -->
+      <div class="form active" id="loginForm">
+        <div class="form-title">Welcome back</div>
+        <div class="form-sub">Login to track and manage your complaints</div>
+        <div id="loginAlert" class="alert"></div>
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password"/>
+        </div>
+        <button class="submit-btn" id="loginBtn" onclick="handleLogin()">
+          <span id="loginBtnText">Login</span>
+          <div class="spinner" id="loginSpinner"></div>
+        </button>
+        <div class="switch-text">Don't have an account? <a href="#" onclick="switchTab('register')">Register here</a></div>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="form" id="registerForm">
+        <div class="form-title">Create account</div>
+        <div class="form-sub">Join thousands of active citizens</div>
+        <div id="registerAlert" class="alert"></div>
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="Your full name"/>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="regEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="regPassword" placeholder="Min. 6 characters"/>
+        </div>
+        <button class="submit-btn" id="registerBtn" onclick="handleRegister()">
+          <span id="registerBtnText">Create Account</span>
+          <div class="spinner" id="registerSpinner"></div>
+        </button>
+        <div class="switch-text">Already have an account? <a href="#" onclick="switchTab('login')">Login here</a></div>
+      </div>
     </div>
-    <input type="file" id="photoInput" accept="image/*" onchange="handlePhoto(this)" />
-    <img id="photoPreview" class="photo-preview" alt="Preview" />
-  </div>
 
-  <!-- LOCATION -->
-  <div class="card">
-    <div class="card-title">Location</div>
-    <div id="map"></div>
-    <input type="text" class="location-input" id="locationAddress" placeholder="Enter address or use GPS below" />
-    <button class="locate-btn" onclick="getLocation()">📍 Use my current location</button>
   </div>
-
-  <!-- SUBMIT -->
-  <button class="submit-btn" id="submitBtn" onclick="submitComplaint()">
-    <span id="submitText">Submit Complaint</span>
-    <div class="spinner" id="submitSpinner"></div>
-  </button>
 </div>
 
-<!-- AI RESULT VIEW -->
-<div class="page ai-result" id="resultView">
-  <div class="page-header">
-    <div class="page-title">✅ Complaint Submitted</div>
-    <div class="page-sub">AI has processed and routed your complaint</div>
-  </div>
-
-  <div class="result-card">
-    <div class="result-header">
-      <div class="result-icon">🤖</div>
-      <div>
-        <div class="result-title">AI Analysis Complete</div>
-        <div class="result-sub">Powered by Google Gemini</div>
-      </div>
-    </div>
-
-    <div class="result-grid">
-      <div class="result-item">
-        <div class="result-item-label">Category</div>
-        <div class="result-item-value" id="resCategory">—</div>
-      </div>
-      <div class="result-item">
-        <div class="result-item-label">Priority</div>
-        <div class="result-item-value" id="resPriority">—</div>
-      </div>
-      <div class="result-item">
-        <div class="result-item-label">Routed To</div>
-        <div class="result-item-value" id="resAuthority">—</div>
-      </div>
-      <div class="result-item">
-        <div class="result-item-label">SDG Goals</div>
-        <div class="sdg-tags" id="resSdg"></div>
-      </div>
-    </div>
-
-    <div class="card-title section-gap">Formal Complaint Generated</div>
-    <div class="formal-box" id="resFormal">—</div>
-  </div>
-
-  <div class="result-card">
-    <div class="card-title" style="margin-bottom:14px;">Your Tracking ID</div>
-    <div class="tracking-id-box">
-      <div>
-        <div class="tracking-label">Save this ID to track your complaint</div>
-        <div class="tracking-id" id="resTrackingId">CP-XXXXXXXX</div>
-      </div>
-      <button class="track-now-btn" onclick="goToTrack()">Track Now →</button>
-    </div>
-  </div>
-
-  <button class="new-report-btn" onclick="resetForm()">+ Report Another Issue</button>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   const API = 'http://localhost:5000/api';
-  let map, marker;
-  let selectedCat = '';
-  let locationData = { address: '', lat: null, lng: null };
-
-  // Auth check
   const token = localStorage.getItem('cp_token');
   const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
-  if (!token) window.location.href = 'login.html';
-  if (user.name) document.getElementById('navUsername').textContent = `Hi, ${user.name.split(' ')[0]}`;
+  if (token && user.role === 'citizen') window.location.href = 'submit.html';
+  if (token && user.role === 'admin') window.location.href = '../admin/dashboard.html';
+  if (window.location.hash === '#register') switchTab('register');
 
-  // Pre-select category from URL
-  const params = new URLSearchParams(window.location.search);
-  const catParam = params.get('cat');
-
-  // Init map
-  window.addEventListener('load', () => {
-    map = L.map('map').setView([30.3165, 78.0322], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    map.on('click', e => {
-      placeMarker(e.latlng.lat, e.latlng.lng);
-      reverseGeocode(e.latlng.lat, e.latlng.lng);
-    });
-
-    if (catParam) {
-      const btn = document.querySelector(`[data-cat="${catParam}"]`);
-      if (btn) selectCat(btn);
-    }
-  });
-
-  function selectCat(btn) {
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selectedCat = btn.dataset.cat;
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1)));
+    document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+    document.getElementById('registerForm').classList.toggle('active', tab === 'register');
   }
 
-  function updateCharCount() {
-    const len = document.getElementById('complaintText').value.length;
-    document.getElementById('charCount').textContent = len;
+  function setLoading(form, on) {
+    document.getElementById(`${form}Btn`).disabled = on;
+    document.getElementById(`${form}BtnText`).style.display = on ? 'none' : 'inline';
+    document.getElementById(`${form}Spinner`).style.display = on ? 'block' : 'none';
   }
 
-  function handlePhoto(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const preview = document.getElementById('photoPreview');
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-      document.getElementById('uploadArea').classList.add('has-file');
-      document.querySelector('.upload-text').textContent = file.name;
-    };
-    reader.readAsDataURL(file);
+  function showAlert(form, msg, type) {
+    const el = document.getElementById(`${form}Alert`);
+    el.textContent = msg; el.className = `alert ${type} show`;
+    setTimeout(() => el.classList.remove('show'), 4000);
   }
 
-  function placeMarker(lat, lng) {
-    if (marker) map.removeLayer(marker);
-    marker = L.marker([lat, lng]).addTo(map);
-    locationData.lat = lat;
-    locationData.lng = lng;
-  }
-
-  function getLocation() {
-    if (!navigator.geolocation) return alert('Geolocation not supported');
-    navigator.geolocation.getCurrentPosition(pos => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-      map.setView([lat, lng], 15);
-      placeMarker(lat, lng);
-      reverseGeocode(lat, lng);
-    }, () => alert('Could not get location. Please enter address manually.'));
-  }
-
-  async function reverseGeocode(lat, lng) {
+  async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) return showAlert('login', 'Please fill in all fields.', 'error');
+    setLoading('login', true);
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
-      const data = await res.json();
-      const addr = data.display_name || '';
-      document.getElementById('locationAddress').value = addr;
-      locationData.address = addr;
-    } catch (e) {}
-  }
-
-  async function submitComplaint() {
-    const text = document.getElementById('complaintText').value.trim();
-    if (!text) return alert('Please describe the issue.');
-    if (text.length < 20) return alert('Please provide more detail (at least 20 characters).');
-
-    const address = document.getElementById('locationAddress').value.trim();
-    locationData.address = address;
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    document.getElementById('submitText').style.display = 'none';
-    document.getElementById('submitSpinner').style.display = 'block';
-
-    try {
-      const res = await fetch(`${API}/complaints`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          rawText: text,
-          category: selectedCat,
-          locationAddress: locationData.address,
-          locationLat: locationData.lat || '',
-          locationLng: locationData.lng || ''
-        })
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       });
-
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Submission failed');
-
-      showResult(data.complaint);
-    } catch (err) {
-      alert(err.message);
-      btn.disabled = false;
-      document.getElementById('submitText').style.display = 'inline';
-      document.getElementById('submitSpinner').style.display = 'none';
-    }
+      if (!res.ok) throw new Error(data.message || 'Login failed');
+      localStorage.setItem('cp_token', data.token);
+      localStorage.setItem('cp_user', JSON.stringify(data.user));
+      showAlert('login', 'Login successful! Redirecting...', 'success');
+      setTimeout(() => {
+        window.location.href = data.user.role === 'admin' ? '../admin/dashboard.html' : 'submit.html';
+      }, 800);
+    } catch (err) { showAlert('login', err.message, 'error'); }
+    finally { setLoading('login', false); }
   }
 
-  function showResult(complaint) {
-    document.getElementById('formView').style.display = 'none';
-    document.getElementById('resultView').classList.add('show');
-
-    document.getElementById('resCategory').textContent = complaint.category || 'N/A';
-
-    const priorityEl = document.getElementById('resPriority');
-    priorityEl.textContent = complaint.priority || 'N/A';
-    priorityEl.className = `result-item-value priority-${(complaint.priority || '').toLowerCase()}`;
-
-    document.getElementById('resAuthority').textContent = complaint.authority || 'N/A';
-    document.getElementById('resFormal').textContent = complaint.formalComplaint || 'N/A';
-    document.getElementById('resTrackingId').textContent = complaint.trackingId || 'N/A';
-
-    const sdgContainer = document.getElementById('resSdg');
-    sdgContainer.innerHTML = '';
-    (complaint.sdgTags || []).forEach(tag => {
-      const span = document.createElement('span');
-      span.className = 'sdg-tag';
-      span.textContent = tag;
-      sdgContainer.appendChild(span);
-    });
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  async function handleRegister() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    if (!name || !email || !password) return showAlert('register', 'Please fill in all fields.', 'error');
+    if (password.length < 6) return showAlert('register', 'Password must be at least 6 characters.', 'error');
+    setLoading('register', true);
+    try {
+      const res = await fetch(`${API}/auth/register`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
+      localStorage.setItem('cp_token', data.token);
+      localStorage.setItem('cp_user', JSON.stringify(data.user));
+      showAlert('register', 'Account created! Redirecting...', 'success');
+      setTimeout(() => window.location.href = 'submit.html', 800);
+    } catch (err) { showAlert('register', err.message, 'error'); }
+    finally { setLoading('register', false); }
   }
 
-  function goToTrack() {
-    const id = document.getElementById('resTrackingId').textContent;
-    window.location.href = `track.html?id=${id}`;
-  }
-
-  function resetForm() {
-    document.getElementById('formView').style.display = 'block';
-    document.getElementById('resultView').classList.remove('show');
-    document.getElementById('complaintText').value = '';
-    document.getElementById('charCount').textContent = '0';
-    document.getElementById('locationAddress').value = '';
-    document.getElementById('photoPreview').style.display = 'none';
-    document.getElementById('uploadArea').classList.remove('has-file');
-    document.querySelector('.upload-text').textContent = 'Click to upload a photo';
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
-    selectedCat = '';
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = false;
-    document.getElementById('submitText').style.display = 'inline';
-    document.getElementById('submitSpinner').style.display = 'none';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function logout() {
-    localStorage.removeItem('cp_token');
-    localStorage.removeItem('cp_user');
-    window.location.href = 'login.html';
-  }
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    document.getElementById('loginForm').classList.contains('active') ? handleLogin() : handleRegister();
+  });
 </script>
 </body>
 </html>

@@ -1,167 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CivicPulse — Report. Track. Resolve.</title>
+  <title>CivicPulse — Smart Civic Complaint Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green: #2ECC71;
-      --green-dark: #25a85c;
-      --green-soft: #e8f8ef;
-      --green-mid: #c5edd6;
-      --cream: #F5F0E8;
-      --cream-dark: #EDE7D9;
+      --blue: #2C5AA0;
+      --blue-dark: #1e3f72;
+      --blue-light: #C1E4F9;
+      --blue-soft: #EBF4FD;
+      --teal: #00A8A8;
+      --teal-soft: #E0F5F5;
+      --bg: #F5F7FA;
       --white: #ffffff;
-      --text: #1f2d1f;
-      --text-mid: #4a5e4a;
-      --text-light: #7a907a;
-      --border: #dde8dd;
+      --text: #222222;
+      --text-mid: #4A5568;
+      --text-light: #8896A5;
+      --border: #E2E8F0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(44,90,160,0.06);
+      --shadow-hover: 0 4px 12px rgba(0,0,0,0.1), 0 8px 32px rgba(44,90,160,0.12);
     }
 
     html { scroll-behavior: smooth; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
-    a { text-decoration: none; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    a { text-decoration: none; color: inherit; }
 
     /* NAV */
     nav {
       background: var(--white);
-      border-bottom: 1.5px solid var(--border);
+      border-bottom: 1px solid var(--border);
       position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 1px 0 var(--border);
     }
+
     .nav-inner {
-      padding: 0 5%;
-      height: 62px; display: flex; align-items: center; justify-content: space-between;
+      
+      padding: 0 5%; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .logo { display: flex; align-items: center; gap: 9px; }
-    .logo-mark {
-      width: 34px; height: 34px; background: var(--green);
-      border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1rem;
+
+    .logo { display: flex; align-items: center; gap: 10px; }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--blue); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
     }
-    .logo-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--text); letter-spacing: -0.3px; }
-    .nav-right { display: flex; gap: 10px; }
-    .btn-ghost {
-      padding: 7px 16px; border: 1.5px solid var(--border); background: transparent;
-      color: var(--text-mid); border-radius: 8px; font-family: 'DM Sans', sans-serif;
-      font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+
+    .logo-name {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800; font-size: 1.15rem;
+      color: var(--text); letter-spacing: -0.3px;
     }
-    .btn-ghost:hover { border-color: var(--green); color: var(--text); }
-    .btn-green {
-      padding: 7px 18px; background: var(--green); color: var(--white); border: none;
-      border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
-      font-weight: 600; cursor: pointer; transition: background 0.2s;
+
+    .logo-name span { color: var(--blue); }
+
+    .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
+    .nav-links a {
+      padding: 6px 14px; border-radius: 8px;
+      font-size: 0.875rem; font-weight: 500; color: var(--text-mid);
+      transition: background 0.15s, color 0.15s;
     }
-    .btn-green:hover { background: var(--green-dark); }
+    .nav-links a:hover { background: var(--blue-soft); color: var(--blue); }
+
+    .nav-actions { display: flex; gap: 8px; }
+
+    .btn-outline {
+      padding: 8px 18px; border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-mid); border-radius: 8px;
+      font-size: 0.875rem; font-weight: 500; cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+
+    .btn-primary {
+      padding: 8px 20px; background: var(--blue); color: var(--white);
+      border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background 0.15s; box-shadow: 0 2px 8px rgba(44,90,160,0.25);
+    }
+    .btn-primary:hover { background: var(--blue-dark); }
 
     /* HERO */
     .hero {
-      padding: 72px 5% 60px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+      
+      padding: 80px 5% 70px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
     }
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--green-soft); border: 1px solid var(--green-mid);
-      color: var(--green-dark); padding: 5px 12px; border-radius: 20px;
-      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.4px; margin-bottom: 22px;
-    }
-    .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; display: inline-block; animation: blink 1.8s infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-    .hero h1 { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 800; color: var(--text); line-height: 1.13; letter-spacing: -1.2px; margin-bottom: 18px; }
-    .hero h1 .g { color: var(--green-dark); }
-    .hero p { color: var(--text-mid); font-size: 1rem; line-height: 1.7; margin-bottom: 34px; max-width: 420px; }
-    .hero-cta { display: flex; gap: 10px; flex-wrap: wrap; }
-    .cta-main {
-      padding: 13px 26px; background: var(--green); color: white; border-radius: 9px;
-      font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700; transition: background 0.2s;
-    }
-    .cta-main:hover { background: var(--green-dark); }
-    .cta-sec {
-      padding: 13px 22px; background: var(--white); color: var(--text-mid); border-radius: 9px;
-      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
-      border: 1.5px solid var(--border); transition: border-color 0.2s;
-    }
-    .cta-sec:hover { border-color: var(--green); color: var(--text); }
 
-    /* MOCKUP */
-    .mockup { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 22px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
-    .mockup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-    .mockup-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text); }
-    .status-pills { display: flex; gap: 6px; }
-    .pill { padding: 3px 10px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; }
-    .pill-green { background: var(--green-soft); color: var(--green-dark); }
-    .pill-orange { background: #fff4e6; color: #c87c00; }
-    .pill-red { background: #ffeaea; color: #c0392b; }
-    .complaint-card { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; }
-    .complaint-card:last-child { margin-bottom: 0; }
-    .c-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--green-soft); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-    .c-body { flex: 1; }
-    .c-type { font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-    .c-desc { font-size: 0.76rem; color: var(--text-light); margin-bottom: 6px; line-height: 1.4; }
-    .c-footer { display: flex; justify-content: space-between; align-items: center; }
-    .c-id { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text-light); }
-    .c-status { padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
-    .s-progress { background: #fff4e6; color: #c87c00; }
-    .s-resolved { background: var(--green-soft); color: var(--green-dark); }
-    .s-submitted { background: #f0f0f0; color: #555; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue-soft); border: 1px solid var(--blue-light);
+      color: var(--blue); padding: 5px 14px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.3px;
+      margin-bottom: 24px;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px; background: var(--teal);
+      border-radius: 50%; animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+    .hero h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 3.2rem; font-weight: 800;
+      color: var(--text); line-height: 1.1;
+      letter-spacing: -1.5px; margin-bottom: 20px;
+    }
+
+    .hero h1 .accent { color: var(--blue); }
+
+    .hero p {
+      font-size: 1.05rem; color: var(--text-mid);
+      line-height: 1.7; margin-bottom: 36px;
+      max-width: 440px;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .hero-btn-main {
+      padding: 14px 28px; background: var(--blue); color: white;
+      border-radius: 10px; font-family: 'Sora', sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(44,90,160,0.3);
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .hero-btn-main:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(44,90,160,0.4); }
+
+    .hero-btn-sec {
+      padding: 14px 24px; background: var(--white); color: var(--text-mid);
+      border-radius: 10px; font-size: 0.95rem; font-weight: 600;
+      border: 1.5px solid var(--border);
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .hero-btn-sec:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* STATS STRIP */
+    .stats-strip {
+      display: flex; gap: 32px; margin-top: 48px;
+      padding-top: 32px; border-top: 1px solid var(--border);
+    }
+
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat-num {
+      font-family: 'Sora', sans-serif; font-size: 1.6rem;
+      font-weight: 800; color: var(--text); line-height: 1;
+    }
+    .stat-num span { color: var(--blue); }
+    .stat-label { font-size: 0.78rem; color: var(--text-light); font-weight: 500; }
+
+    /* HERO RIGHT - COMPLAINT MOCKUP */
+    .hero-right { position: relative; }
+
+    .mockup-card {
+      background: var(--white); border-radius: 20px;
+      border: 1px solid var(--border); padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .mockup-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 20px;
+    }
+
+    .mockup-title {
+      font-family: 'Sora', sans-serif; font-weight: 700;
+      font-size: 0.9rem; color: var(--text);
+    }
+
+    .live-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: #E8FBF5; border: 1px solid #B8F0DA;
+      border-radius: 20px; padding: 3px 10px;
+      font-size: 0.68rem; font-weight: 700; color: #1A7A50;
+    }
+
+    .live-dot { width: 6px; height: 6px; background: #22C55E; border-radius: 50%; animation: pulse 1.5s infinite; }
+
+    .complaint-item {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px; margin-bottom: 10px;
+      display: flex; gap: 12px; align-items: flex-start;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .complaint-item:hover { border-color: var(--blue-light); box-shadow: var(--shadow); }
+    .complaint-item:last-child { margin-bottom: 0; }
+
+    .ci-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--blue-soft); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+
+    .ci-body { flex: 1; }
+    .ci-type { font-weight: 700; font-size: 0.85rem; color: var(--text); margin-bottom: 2px; }
+    .ci-desc { font-size: 0.73rem; color: var(--text-light); margin-bottom: 7px; }
+    .ci-foot { display: flex; justify-content: space-between; align-items: center; }
+    .ci-id { font-size: 0.65rem; color: var(--text-light); font-family: monospace; }
+
+    .tag {
+      padding: 2px 9px; border-radius: 20px;
+      font-size: 0.65rem; font-weight: 700;
+    }
+    .tag-orange { background: #FFF4E6; color: #C87C00; }
+    .tag-red { background: #FFF0F0; color: #C0392B; }
+    .tag-green { background: #E8FBF5; color: #1A7A50; }
+    .tag-blue { background: var(--blue-soft); color: var(--blue); }
 
     /* CATEGORIES */
-    .cats-section { background: var(--white); border-top: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); padding: 52px 5%; }
-    .cats-inner {  }
-    .section-label { font-family: 'Outfit', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 6px; }
-    .section-heading { font-family: 'Outfit', sans-serif; font-size: 1.7rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 32px; }
-    .cats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
-    .cat-item {
-      background: var(--cream); border: 1.5px solid var(--border); border-radius: 14px;
-      padding: 18px 12px; display: flex; flex-direction: column; align-items: center;
-      gap: 10px; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.15s;
-    }
-    .cat-item:hover { border-color: var(--green); background: var(--green-soft); transform: translateY(-2px); }
-    .cat-emoji { font-size: 1.6rem; }
-    .cat-name { font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 600; color: var(--text-mid); text-align: center; line-height: 1.3; }
+    .section-wrap { background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 
-    /* TRACK */
-    .track-wrap { padding: 70px 5%; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-    .track-left h2 { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 10px; line-height: 1.2; }
-    .track-left p { color: var(--text-mid); font-size: 0.93rem; line-height: 1.65; margin-bottom: 28px; }
-    .track-row { display: flex; gap: 8px; }
-    .track-input {
-      flex: 1; padding: 12px 16px; background: var(--white); border: 1.5px solid var(--border);
-      border-radius: 9px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
-      color: var(--text); outline: none; transition: border-color 0.2s;
+    .section {
+      
+      padding: 64px 5%;
     }
-    .track-input::placeholder { color: var(--text-light); }
-    .track-input:focus { border-color: var(--green); }
-    .track-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; }
-    .track-card-label { font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 18px; }
-    .status-step { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
-    .status-step:last-child { margin-bottom: 0; }
-    .step-col { display: flex; flex-direction: column; align-items: center; }
-    .step-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; flex-shrink: 0; }
-    .step-dot.done { background: var(--green); color: white; }
-    .step-dot.active { background: #fff4e6; border: 2px solid #e67e22; color: #e67e22; }
-    .step-dot.pending { background: #f0f0f0; color: #aaa; }
-    .step-line { width: 2px; height: 16px; background: var(--border); margin: 3px 0; }
-    .step-name { font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 1px; padding-top: 2px; }
-    .step-name.muted { color: var(--text-light); }
-    .step-desc { font-size: 0.72rem; color: var(--text-light); }
+
+    .section-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.2px; color: var(--blue); margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: 'Sora', sans-serif; font-size: 1.8rem;
+      font-weight: 800; color: var(--text);
+      letter-spacing: -0.5px; margin-bottom: 36px;
+    }
+
+    .cats-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;
+    }
+
+    .cat-card {
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 20px 12px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cat-card:hover {
+      background: var(--blue-soft); border-color: var(--blue-light);
+      transform: translateY(-3px); box-shadow: var(--shadow-hover);
+    }
+
+    .cat-emoji { font-size: 1.6rem; }
+    .cat-name {
+      font-size: 0.72rem; font-weight: 700;
+      color: var(--text-mid); text-align: center; line-height: 1.3;
+    }
+
+    /* HOW IT WORKS */
+    .how-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+
+    .how-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .how-card:hover { box-shadow: var(--shadow-hover); border-color: var(--blue-light); }
+
+    .how-num {
+      width: 40px; height: 40px; background: var(--blue);
+      border-radius: 10px; display: flex; align-items: center;
+      justify-content: center; font-family: 'Sora', sans-serif;
+      font-weight: 800; font-size: 1rem; color: white; margin-bottom: 18px;
+    }
+
+    .how-card h3 {
+      font-family: 'Sora', sans-serif; font-size: 1rem;
+      font-weight: 700; color: var(--text); margin-bottom: 8px;
+    }
+
+    .how-card p { font-size: 0.875rem; color: var(--text-mid); line-height: 1.65; }
+
+    /* TRACK SECTION */
+    .track-section {
+      background: var(--blue); padding: 64px 5%;
+    }
+
+    .track-inner {
+      
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+    }
+
+    .track-left h2 {
+      font-family: 'Sora', sans-serif; font-size: 2rem;
+      font-weight: 800; color: white; letter-spacing: -0.5px;
+      margin-bottom: 10px; line-height: 1.2;
+    }
+
+    .track-left p { color: rgba(255,255,255,0.6); font-size: 0.95rem; margin-bottom: 28px; }
+
+    .track-row { display: flex; gap: 8px; }
+
+    .track-input {
+      flex: 1; padding: 13px 18px;
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      border-radius: 10px; color: white;
+      font-family: monospace; font-size: 0.9rem;
+      outline: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .track-input::placeholder { color: rgba(255,255,255,0.35); }
+    .track-input:focus { border-color: var(--teal); background: rgba(255,255,255,0.15); }
+
+    .track-btn {
+      padding: 13px 24px; background: var(--teal); color: white;
+      border: none; border-radius: 10px; font-family: 'Sora', sans-serif;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      transition: background 0.15s; white-space: nowrap;
+    }
+    .track-btn:hover { background: #008080; }
+
+    /* TIMELINE */
+    .timeline-card {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px; padding: 24px;
+    }
+
+    .tl-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: rgba(255,255,255,0.4); margin-bottom: 18px;
+    }
+
+    .tl-step { display: flex; gap: 14px; margin-bottom: 16px; }
+    .tl-step:last-child { margin-bottom: 0; }
+
+    .tl-col { display: flex; flex-direction: column; align-items: center; }
+    .tl-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; font-weight: 700; flex-shrink: 0;
+    }
+    .tl-dot.done { background: var(--teal); color: white; }
+    .tl-dot.active { background: rgba(255,255,255,0.1); border: 2px solid var(--teal); color: var(--teal); }
+    .tl-dot.pending { background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.3); }
+    .tl-line { width: 2px; flex: 1; min-height: 14px; background: rgba(255,255,255,0.1); margin: 3px 0; }
+
+    .tl-name { font-size: 0.82rem; font-weight: 700; color: white; padding-top: 2px; margin-bottom: 1px; }
+    .tl-name.muted { color: rgba(255,255,255,0.35); }
+    .tl-desc { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
 
     /* FOOTER */
-    footer { background: var(--white); border-top: 1.5px solid var(--border); padding: 28px 5%; }
-    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    footer {
+      background: var(--white); border-top: 1px solid var(--border);
+      padding: 28px 5%;
+    }
+
+    .footer-inner {
+      
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+
     .footer-copy { font-size: 0.8rem; color: var(--text-light); }
     .footer-links { display: flex; gap: 20px; }
-    .footer-links a { font-size: 0.8rem; color: var(--text-light); transition: color 0.2s; }
-    .footer-links a:hover { color: var(--text); }
+    .footer-links a { font-size: 0.8rem; color: var(--text-light); transition: color 0.15s; }
+    .footer-links a:hover { color: var(--blue); }
 
-    @media (max-width: 860px) {
-      .hero { grid-template-columns: 1fr; gap: 40px; padding: 50px 20px 40px; }
-      .mockup { display: none; }
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-left > * { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+    .hero-left > *:nth-child(1) { animation-delay: 0.1s; }
+    .hero-left > *:nth-child(2) { animation-delay: 0.2s; }
+    .hero-left > *:nth-child(3) { animation-delay: 0.3s; }
+    .hero-left > *:nth-child(4) { animation-delay: 0.4s; }
+    .hero-left > *:nth-child(5) { animation-delay: 0.5s; }
+    .hero-right { animation: fadeUp 0.7s 0.3s ease forwards; opacity: 0; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 40px; padding: 50px 5%; }
+      .hero-right { display: none; }
       .cats-grid { grid-template-columns: repeat(3, 1fr); }
-      .track-wrap { grid-template-columns: 1fr; padding: 50px 20px; }
+      .how-grid { grid-template-columns: 1fr; }
+      .track-inner { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2.4rem; }
+    }
+
+    @media (max-width: 560px) {
+      .cats-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
     }
   </style>
 </head>
@@ -171,12 +408,17 @@
 <nav>
   <div class="nav-inner">
     <div class="logo">
-      <div class="logo-mark">📍</div>
-      <span class="logo-name">CivicPulse</span>
+      <div class="logo-icon">CP</div>
+      <span class="logo-name">Civic<span>Pulse</span></span>
     </div>
-    <div class="nav-right">
-      <a href="login.html" class="btn-ghost">Login</a>
-      <a href="login.html#register" class="btn-green">Report Issue</a>
+    <ul class="nav-links">
+      <li><a href="#categories">Report</a></li>
+      <li><a href="#how">How it Works</a></li>
+      <li><a href="#track">Track</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn-outline">Login</a>
+      <a href="login.html#register" class="btn-primary">Report Issue</a>
     </div>
   </div>
 </nav>
@@ -184,55 +426,61 @@
 <!-- HERO -->
 <section>
   <div class="hero">
-    <div>
-      <div class="hero-eyebrow"><div class="dot"></div> AI-Powered · Gemini</div>
-      <h1>Report civic issues.<br/><span class="g">Get them resolved.</span></h1>
-      <p>Describe your issue in plain language — garbage, pothole, water leakage, broken streetlight. CivicPulse routes it to the right authority instantly.</p>
-      <div class="hero-cta">
-        <a href="submit.html" class="cta-main">Report an Issue →</a>
-        <a href="track.html" class="cta-sec">Track Complaint</a>
+    <div class="hero-left">
+      <div class="hero-badge"><div class="badge-dot"></div> AI-Powered · Gemini</div>
+      <h1>Your city.<br/>Your voice.<br/><span class="accent">Real action.</span></h1>
+      <p>Report civic issues in plain language — garbage, potholes, water leaks, broken streetlights. Our AI routes it to the right authority in seconds.</p>
+      <div class="hero-actions">
+        <a href="submit.html" class="hero-btn-main">Report an Issue →</a>
+        <a href="track.html" class="hero-btn-sec">Track Complaint</a>
+      </div>
+      <div class="stats-strip">
+        <div class="stat"><div class="stat-num">2.4<span>K+</span></div><div class="stat-label">Complaints Filed</div></div>
+        <div class="stat"><div class="stat-num">87<span>%</span></div><div class="stat-label">Resolution Rate</div></div>
+        <div class="stat"><div class="stat-num">48<span>h</span></div><div class="stat-label">Avg. Response</div></div>
       </div>
     </div>
 
-    <div class="mockup">
-      <div class="mockup-header">
-        <span class="mockup-title">Recent Reports</span>
-        <div class="status-pills">
-          <span class="pill pill-red">2 Critical</span>
-          <span class="pill pill-orange">4 In Progress</span>
-          <span class="pill pill-green">11 Resolved</span>
+    <div class="hero-right">
+      <div class="mockup-card">
+        <div class="mockup-header">
+          <span class="mockup-title">Recent Reports</span>
+          <span class="live-badge"><div class="live-dot"></div> Live</span>
         </div>
-      </div>
-      <div class="complaint-card">
-        <div class="c-icon">🗑️</div>
-        <div class="c-body">
-          <div class="c-type">Garbage Overflow</div>
-          <div class="c-desc">Garbage pile near market, not collected for 4 days</div>
-          <div class="c-footer">
-            <span class="c-id">CP-A4F82B1C</span>
-            <span class="c-status s-progress">In Progress</span>
+
+        <div class="complaint-item">
+          <div class="ci-icon">🗑️</div>
+          <div class="ci-body">
+            <div class="ci-type">Garbage Overflow</div>
+            <div class="ci-desc">Market area, not collected for 4 days</div>
+            <div class="ci-foot">
+              <span class="ci-id">CP-A4F82B1C</span>
+              <span class="tag tag-orange">In Progress</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="complaint-card">
-        <div class="c-icon">💧</div>
-        <div class="c-body">
-          <div class="c-type">Water Leakage</div>
-          <div class="c-desc">Pipe burst on main road, water wasting since morning</div>
-          <div class="c-footer">
-            <span class="c-id">CP-D3C92A4E</span>
-            <span class="c-status s-submitted">Submitted</span>
+
+        <div class="complaint-item">
+          <div class="ci-icon">💧</div>
+          <div class="ci-body">
+            <div class="ci-type">Water Pipe Burst</div>
+            <div class="ci-desc">Main road, wasting since morning</div>
+            <div class="ci-foot">
+              <span class="ci-id">CP-D3C92A4E</span>
+              <span class="tag tag-red">Critical</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="complaint-card">
-        <div class="c-icon">🚦</div>
-        <div class="c-body">
-          <div class="c-type">Traffic Signal Down</div>
-          <div class="c-desc">Signal at main junction not working since last night</div>
-          <div class="c-footer">
-            <span class="c-id">CP-B1E74F2D</span>
-            <span class="c-status s-resolved">Resolved ✓</span>
+
+        <div class="complaint-item">
+          <div class="ci-icon">🚦</div>
+          <div class="ci-body">
+            <div class="ci-type">Traffic Signal Down</div>
+            <div class="ci-desc">Main junction, not working since last night</div>
+            <div class="ci-foot">
+              <span class="ci-id">CP-B1E74F2D</span>
+              <span class="tag tag-green">Resolved ✓</span>
+            </div>
           </div>
         </div>
       </div>
@@ -241,32 +489,32 @@
 </section>
 
 <!-- CATEGORIES -->
-<div class="cats-section">
-  <div class="cats-inner">
+<div class="section-wrap" id="categories">
+  <div class="section">
     <div class="section-label">What do you want to report?</div>
-    <div class="section-heading">Select a category</div>
+    <div class="section-title">Select a category</div>
     <div class="cats-grid">
-      <a href="submit.html?cat=roads" class="cat-item">
+      <a href="submit.html?cat=roads" class="cat-card">
         <span class="cat-emoji">🛣️</span>
         <span class="cat-name">Roads & Infrastructure</span>
       </a>
-      <a href="submit.html?cat=water" class="cat-item">
+      <a href="submit.html?cat=water" class="cat-card">
         <span class="cat-emoji">💧</span>
         <span class="cat-name">Water Supply</span>
       </a>
-      <a href="submit.html?cat=garbage" class="cat-item">
+      <a href="submit.html?cat=garbage" class="cat-card">
         <span class="cat-emoji">🗑️</span>
         <span class="cat-name">Garbage & Waste</span>
       </a>
-      <a href="submit.html?cat=drainage" class="cat-item">
+      <a href="submit.html?cat=drainage" class="cat-card">
         <span class="cat-emoji">🌊</span>
         <span class="cat-name">Drainage & Sewage</span>
       </a>
-      <a href="submit.html?cat=electricity" class="cat-item">
+      <a href="submit.html?cat=electricity" class="cat-card">
         <span class="cat-emoji">⚡</span>
         <span class="cat-name">Electricity & Streetlights</span>
       </a>
-      <a href="submit.html?cat=other" class="cat-item">
+      <a href="submit.html?cat=other" class="cat-card">
         <span class="cat-emoji">📋</span>
         <span class="cat-name">Public Nuisance</span>
       </a>
@@ -274,75 +522,78 @@
   </div>
 </div>
 
-<!-- TRACK -->
-<section>
-  <div class="track-wrap">
-    <div class="track-left">
-      <h2>Already filed?<br/>Track your complaint.</h2>
-      <p>Enter your tracking ID to see real-time status — from submission to resolution.</p>
-      <div class="track-row">
-        <input type="text" class="track-input" placeholder="CP-XXXXXXXX" id="trackInput" />
-        <button class="btn-green" onclick="trackComplaint()">Track →</button>
+<!-- HOW IT WORKS -->
+<div id="how">
+  <div class="section">
+    <div class="section-label">How It Works</div>
+    <div class="section-title">Three steps to resolution</div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">01</div>
+        <h3>Describe the Issue</h3>
+        <p>Type your complaint in plain language. Add a photo and pin your location on the map — no forms, no confusion about which department.</p>
       </div>
-    </div>
-
-    <div class="track-card">
-      <div class="track-card-label">Status Timeline — Example</div>
-      <div class="status-step">
-        <div class="step-col">
-          <div class="step-dot done">✓</div>
-          <div class="step-line"></div>
-        </div>
-        <div>
-          <div class="step-name">Submitted</div>
-          <div class="step-desc">Complaint received & AI processed</div>
-        </div>
+      <div class="how-card">
+        <div class="how-num">02</div>
+        <h3>AI Routes It</h3>
+        <p>Gemini AI reads your complaint, assigns a priority level, generates a formal complaint, and routes it to the correct government department automatically.</p>
       </div>
-      <div class="status-step">
-        <div class="step-col">
-          <div class="step-dot done">✓</div>
-          <div class="step-line"></div>
-        </div>
-        <div>
-          <div class="step-name">Routed to Authority</div>
-          <div class="step-desc">Sent to Municipal Sanitation Dept.</div>
-        </div>
-      </div>
-      <div class="status-step">
-        <div class="step-col">
-          <div class="step-dot active">●</div>
-          <div class="step-line"></div>
-        </div>
-        <div>
-          <div class="step-name">In Progress</div>
-          <div class="step-desc">Team assigned, work underway</div>
-        </div>
-      </div>
-      <div class="status-step">
-        <div class="step-col">
-          <div class="step-dot pending">○</div>
-        </div>
-        <div>
-          <div class="step-name muted">Resolved</div>
-          <div class="step-desc">Awaiting confirmation</div>
-        </div>
+      <div class="how-card">
+        <div class="how-num">03</div>
+        <h3>Track & Resolve</h3>
+        <p>Get a unique tracking ID. Monitor your complaint's status in real time. Earn badges and points for active civic participation.</p>
       </div>
     </div>
   </div>
-</section>
+</div>
+
+<!-- TRACK -->
+<div class="track-section" id="track">
+  <div class="track-inner">
+    <div class="track-left">
+      <h2>Already filed?<br/>Track your complaint.</h2>
+      <p>Enter your tracking ID to get real-time status updates — from submission to resolution.</p>
+      <div class="track-row">
+        <input type="text" class="track-input" placeholder="CP-XXXXXXXX" id="trackInput"/>
+        <button class="track-btn" onclick="trackComplaint()">Track →</button>
+      </div>
+    </div>
+
+    <div class="timeline-card">
+      <div class="tl-label">Status Timeline — Example</div>
+
+      <div class="tl-step">
+        <div class="tl-col"><div class="tl-dot done">✓</div><div class="tl-line"></div></div>
+        <div><div class="tl-name">Submitted</div><div class="tl-desc">Complaint received & AI processed</div></div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-col"><div class="tl-dot done">✓</div><div class="tl-line"></div></div>
+        <div><div class="tl-name">Routed to Authority</div><div class="tl-desc">Sent to Municipal Sanitation Dept.</div></div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-col"><div class="tl-dot active">●</div><div class="tl-line"></div></div>
+        <div><div class="tl-name">In Progress</div><div class="tl-desc">Team assigned, work underway</div></div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-col"><div class="tl-dot pending">○</div></div>
+        <div><div class="tl-name muted">Resolved</div><div class="tl-desc">Awaiting confirmation</div></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div class="logo">
-      <div class="logo-mark" style="width:28px;height:28px;font-size:0.8rem;">📍</div>
-      <span class="logo-name" style="font-size:1rem;">CivicPulse</span>
+      <div class="logo-icon" style="width:28px;height:28px;font-size:0.65rem;">CP</div>
+      <span class="logo-name" style="font-size:1rem;">Civic<span>Pulse</span></span>
     </div>
-    <span class="footer-copy">© 2026 CivicPulse. All rights reserved.</span>
+    
     <div class="footer-links">
       <a href="submit.html">Report Issue</a>
       <a href="track.html">Track</a>
-      <a href="admin/login.html">Admin</a>
+      <a href="../admin/login.html">Admin</a>
     </div>
   </div>
 </footer>
