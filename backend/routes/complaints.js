@@ -1,9 +1,18 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Complaint = require('../models/Complaint');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const router = express.Router();
+
+// Multer setup
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads')),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/\s/g, '_'))
+});
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -18,19 +27,44 @@ const DEPARTMENT_MAP = {
 
 async function processWithGemini(text, category) {
   const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  const prompt = `You are a civic complaint processing AI for an Indian city. Analyze this complaint and respond ONLY with a valid JSON object, no markdown, no extra text.
-Complaint: "${text}"
-Category hint: "${category || 'unknown'}"
-Respond with exactly this JSON structure:
-{"category":"one of: Garbage & Waste, Water Supply, Roads & Infrastructure, Electricity & Streetlights, Drainage & Sewage, Public Nuisance","priority":"one of: Low, Medium, High, Critical","authority":"specific department name","department":"one of: Sanitation, Water, Roads, Electricity, Municipal","sdgTags":["SDG 11"],"sdgMessage":"one sentence","formalComplaint":"formal complaint"}`;
+
+  const prompt = `You are a civic complaint AI for Indian cities. Analyze this complaint carefully and return ONLY a raw JSON object (no markdown, no backticks, no extra text).
+
+Complaint text: "${text}"
+Suggested category: "${category || 'unknown'}"
+
+Rules:
+- category: pick the BEST match from: Garbage & Waste, Water Supply, Roads & Infrastructure, Electricity & Streetlights, Drainage & Sewage, Public Nuisance
+- priority: Critical (immediate danger/health risk), High (major disruption), Medium (moderate issue), Low (minor inconvenience)
+- authority: the specific department name e.g. "Municipal Sanitation Department" or "Public Works Department"
+- department: one of exactly: Sanitation, Water, Roads, Electricity, Municipal
+- sdgTags: array of relevant SDG numbers e.g. ["SDG 11", "SDG 6"]
+- sdgMessage: one sentence about environmental/social impact
+- formalComplaint: formal 2-3 sentence complaint in official language
+
+Return ONLY this JSON:
+{"category":"...","priority":"...","authority":"...","department":"...","sdgTags":["..."],"sdgMessage":"...","formalComplaint":"..."}`;
+
   const result = await model.generateContent(prompt);
-  const responseText = result.response.text().trim();
-  const cleaned = responseText.replace(/```json|```/g, '').trim();
-  return JSON.parse(cleaned);
+  let text2 = result.response.text().trim();
+  // Remove any markdown code blocks if present
+  text2 = text2.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  // Find JSON object
+  const start = text2.indexOf('{');
+  const end = text2.lastIndexOf('}');
+  if (start !== -1 && end !== -1) {
+    text2 = text2.substring(start, end + 1);
+  }
+  return JSON.parse(text2);
 }
 
-router.post('/', protect, async (req, res) => {
-  console.log('COMPLAINT HIT');
+// POST /api/complaints
+router.post('/', protect, (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ message: err.message });
+    next();
+  });
+}, async (req, res) => {
   try {
     const { rawText, category, locationAddress, locationLat, locationLng } = req.body;
     if (!rawText) return res.status(400).json({ message: 'Complaint text is required' });
@@ -38,16 +72,19 @@ router.post('/', protect, async (req, res) => {
     let aiData = {};
     try {
       aiData = await processWithGemini(rawText, category);
+      console.log('Gemini result:', aiData);
     } catch (aiErr) {
       console.error('Gemini error:', aiErr.message);
+      // Smart fallback based on category
+      const dept = DEPARTMENT_MAP[category] || 'Municipal';
       aiData = {
         category: category || 'Public Nuisance',
         priority: 'Medium',
-        authority: 'Municipal Corporation',
-        department: 'Municipal',
+        authority: `${dept} Department`,
+        department: dept,
         sdgTags: ['SDG 11'],
-        sdgMessage: 'This issue affects sustainable urban living.',
-        formalComplaint: `This is to bring to your attention that ${rawText}`
+        sdgMessage: 'This issue affects sustainable urban living and community well-being.',
+        formalComplaint: `This is to respectfully bring to your attention that ${rawText}. Immediate action is requested to resolve this civic issue and restore normalcy for the affected residents.`
       };
     }
 
@@ -66,33 +103,39 @@ router.post('/', protect, async (req, res) => {
         lat: locationLat ? parseFloat(locationLat) : null,
         lng: locationLng ? parseFloat(locationLng) : null
       },
-      imageUrl: '',
+      imageUrl: req.file ? `/uploads/${req.file.filename}` : '',
       aiProcessed: true
     });
 
+    // Update user stats and badges
     const user = await User.findById(req.user._id);
     user.complaintCount += 1;
-    if (aiData.sdgTags?.length && !user.badges.includes('eco_warrior')) { user.badges.push('eco_warrior'); user.points += 200; }
-    if (['Critical', 'High'].includes(aiData.priority) && !user.badges.includes('rapid_reporter')) { user.badges.push('rapid_reporter'); user.points += 150; }
+    if (aiData.sdgTags?.length && !user.badges.includes('eco_warrior')) {
+      user.badges.push('eco_warrior'); user.points += 200;
+    }
+    if (['Critical', 'High'].includes(aiData.priority) && !user.badges.includes('rapid_reporter')) {
+      user.badges.push('rapid_reporter'); user.points += 150;
+    }
     user.checkAndAwardBadges();
     await user.save();
 
-    console.log('Created:', complaint.trackingId);
     res.status(201).json({ complaint });
   } catch (err) {
-    console.error('ERROR:', err.message);
+    console.error('COMPLAINT ERROR:', err.message);
     res.status(500).json({ message: err.message });
   }
 });
 
+// GET /api/complaints/track/:trackingId
 router.get('/track/:trackingId', async (req, res) => {
   try {
     const complaint = await Complaint.findOne({ trackingId: req.params.trackingId });
-    if (!complaint) return res.status(404).json({ message: 'Complaint not found.' });
+    if (!complaint) return res.status(404).json({ message: 'Complaint not found. Check your tracking ID.' });
     res.json({ complaint });
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+// GET /api/complaints/my
 router.get('/my', protect, async (req, res) => {
   try {
     const complaints = await Complaint.find({ user: req.user._id }).sort({ createdAt: -1 });

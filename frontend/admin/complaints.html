@@ -247,6 +247,11 @@
       <div class="formal-box" id="mFormal">—</div>
     </div>
 
+    <div class="modal-section" id="mImageSection" style="display:none;">
+      <div class="modal-label">Attached Photo</div>
+      <img id="mImage" src="" alt="Complaint photo" style="width:100%;border-radius:10px;max-height:200px;object-fit:cover;"/>
+    </div>
+
     <div class="update-section">
       <div class="update-title">Update Complaint</div>
       <select class="update-select" id="updateStatus">
@@ -333,6 +338,13 @@
     document.getElementById('mFormal').textContent = c.formalComplaint || '—';
     document.getElementById('mSdgMsg').textContent = c.sdgMessage || '';
     document.getElementById('mSdg').innerHTML = (c.sdgTags || []).map(t => `<span class="sdg-tag-lg">${t}</span>`).join('');
+    // Show image if exists
+    if (c.imageUrl) {
+      document.getElementById('mImage').src = 'http://localhost:5000' + c.imageUrl;
+      document.getElementById('mImageSection').style.display = 'block';
+    } else {
+      document.getElementById('mImageSection').style.display = 'none';
+    }
     document.getElementById('updateStatus').value = c.status;
     document.getElementById('updateNotes').value = c.adminNotes || '';
     document.getElementById('modalOverlay').classList.add('open');
