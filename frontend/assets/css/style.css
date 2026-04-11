@@ -1,0 +1,136 @@
+/* 
+   CivicPulse Premium Theme Override 
+   Pristine Light & Glassmorphism 
+*/
+
+:root {
+  /* Vibrant & Clean Colors */
+  --blue: #0062FF !important; 
+  --blue-dark: #0044C7 !important; 
+  --blue-light: #DCE8FF !important;
+  --blue-soft: rgba(0, 98, 255, 0.08) !important;
+  
+  --teal: #00C2C2 !important;
+  --teal-soft: rgba(0, 194, 194, 0.1) !important;
+  
+  --bg: #FCFDFF !important;
+  --white: rgba(255, 255, 255, 0.7) !important; 
+  
+  --text: #0F172A !important; 
+  --text-mid: #475569 !important; 
+  --text-light: #94A3B8 !important;
+  
+  --border: rgba(226, 232, 240, 0.7) !important;
+  --error: #E11D48 !important;
+  --error-soft: #FFE4E6 !important;
+  
+  --sidebar-bg: #0B1120 !important;
+  
+  --shadow: 0 10px 40px -10px rgba(0, 50, 150, 0.05) !important;
+  --shadow-hover: 0 20px 40px -10px rgba(0, 98, 255, 0.12) !important;
+}
+
+/* Ambient Background Mesh */
+body::before {
+  content: "";
+  position: fixed;
+  top: -20vh;
+  left: -20vw;
+  width: 70vw;
+  height: 70vh;
+  background: radial-gradient(circle, rgba(0, 98, 255, 0.06) 0%, rgba(252, 253, 255, 0) 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+body::after {
+  content: "";
+  position: fixed;
+  bottom: -20vh;
+  right: -20vw;
+  width: 70vw;
+  height: 70vh;
+  background: radial-gradient(circle, rgba(0, 194, 194, 0.08) 0%, rgba(252, 253, 255, 0) 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Glassmorphism Classes */
+.card, .stat-card, .full-card, .how-card, .mockup-card, .cat-card, .timeline-card {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--shadow) !important;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s !important;
+}
+
+/* Only auth-wrap gets a solid mostly-white bg with blur to keep inputs very readable */
+.auth-wrap {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--shadow-hover) !important;
+}
+
+/* Smooth Hover Lifts */
+.card:hover, .stat-card:hover, .how-card:hover, .mockup-card:hover, .cat-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--shadow-hover) !important;
+  border-color: rgba(0, 98, 255, 0.2) !important;
+}
+
+/* Nav & Sidebar Glass */
+nav {
+  background: rgba(252, 253, 255, 0.8) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+.sidebar {
+  background: rgba(11, 17, 32, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Premium Buttons */
+.btn-primary, .hero-btn-main, .submit-btn, .track-btn {
+  background: linear-gradient(135deg, var(--blue), #004CE6) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 8px 20px -6px rgba(0, 98, 255, 0.5) !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.btn-primary:hover, .hero-btn-main:hover, .submit-btn:hover, .track-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 24px -6px rgba(0, 98, 255, 0.6) !important;
+}
+
+/* Form Inputs */
+input, textarea, select {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  background: #ffffff !important;
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 0 3px rgba(0, 98, 255, 0.1) !important;
+}
+
+/* Section Wrapping */
+.section-wrap {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Dark mode elements explicitly handled */
+.track-section {
+  background: linear-gradient(135deg, var(--sidebar-bg), #1E293B) !important;
+  position: relative;
+  overflow: hidden;
+}
