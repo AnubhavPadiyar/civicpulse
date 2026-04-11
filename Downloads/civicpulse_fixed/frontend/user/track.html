@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CivicPulse — Track Complaint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #2C5AA0; --blue-dark: #1e3f72; --blue-light: #C1E4F9; --blue-soft: #EBF4FD;
+      --teal: #00A8A8; --teal-soft: #E0F5F5;
+      --bg: #F5F7FA; --white: #ffffff;
+      --text: #222222; --text-mid: #4A5568; --text-light: #8896A5;
+      --border: #E2E8F0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(44,90,160,0.06);
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    /* NAV */
+    nav { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-inner { padding: 0 5%; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 34px; height: 34px; background: var(--blue); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 0.7rem; color: white; }
+    .logo-name { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--text); }
+    .logo-name span { color: var(--blue); }
+    .nav-right { display: flex; gap: 8px; }
+    .btn-ghost { padding: 6px 14px; border: 1.5px solid var(--border); background: transparent; color: var(--text-mid); border-radius: 8px; font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: border-color 0.15s, color 0.15s; }
+    .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+    .btn-primary { padding: 6px 16px; background: var(--blue); color: white; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--blue-dark); }
+
+    /* PAGE */
+    .page { max-width: 720px; margin: auto; padding: 44px 5% 80px; }
+
+    /* SEARCH */
+    .search-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+    .search-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 12px; }
+    .search-row { display: flex; gap: 8px; }
+    .search-input {
+      flex: 1; padding: 12px 16px; background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 9px; font-family: monospace; font-size: 0.9rem; color: var(--text);
+      outline: none; transition: border-color 0.15s; text-transform: uppercase;
+    }
+    .search-input:focus { border-color: var(--blue); background: var(--white); }
+    .search-input::placeholder { color: var(--text-light); text-transform: none; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .search-btn { padding: 12px 22px; background: var(--blue); color: white; border: none; border-radius: 9px; font-family: 'Sora', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.15s; white-space: nowrap; box-shadow: 0 2px 8px rgba(44,90,160,0.25); }
+    .search-btn:hover { background: var(--blue-dark); }
+
+    /* STATES */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-icon { width: 56px; height: 56px; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+    .empty-title { font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .empty-sub { font-size: 0.875rem; color: var(--text-light); }
+
+    .error-box { background: #FFF0F0; border: 1px solid #FCCACA; border-radius: 12px; padding: 18px 20px; color: #C0392B; font-size: 0.875rem; font-weight: 500; }
+
+    /* DETAIL */
+    .detail { display: none; }
+    .detail.show { display: block; }
+
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 14px; box-shadow: var(--shadow); }
+
+    .detail-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+    .detail-id { font-family: monospace; font-size: 0.78rem; color: var(--text-light); margin-bottom: 4px; }
+    .detail-type { font-family: 'Sora', sans-serif; font-size: 1.35rem; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+
+    .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; font-family: 'Sora', sans-serif; }
+    .s-submitted { background: #F0F0F0; color: #555; }
+    .s-under-review { background: var(--blue-soft); color: var(--blue); }
+    .s-in-progress { background: #FFF4E6; color: #C87C00; }
+    .s-resolved { background: #E8FBF5; color: #1A7A50; }
+    .s-rejected { background: #FFF0F0; color: #C0392B; }
+
+    .meta-row { display: flex; flex-wrap: wrap; gap: 16px; }
+    .meta-item { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-mid); }
+    .meta-dot { width: 4px; height: 4px; background: var(--border); border-radius: 50%; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .info-item { background: var(--bg); border-radius: 10px; padding: 14px; }
+    .info-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 5px; }
+    .info-value { font-family: 'Sora', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .priority-critical { color: #C0392B; }
+    .priority-high { color: #C87C00; }
+    .priority-medium { color: #B7791F; }
+    .priority-low { color: var(--teal); }
+
+    .card-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 12px; }
+
+    .sdg-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+    .sdg-tag { padding: 5px 12px; background: var(--teal-soft); border: 1px solid #B2E8E8; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--teal); }
+    .sdg-msg { font-size: 0.83rem; color: var(--text-mid); line-height: 1.6; font-style: italic; }
+
+    .formal-box { background: var(--bg); border-left: 3px solid var(--blue); border-radius: 0 9px 9px 0; padding: 14px 16px; font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
+
+    /* TIMELINE */
+    .timeline { display: flex; flex-direction: column; }
+    .tl-step { display: flex; gap: 14px; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; }
+    .tl-dot { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.62rem; font-weight: 700; flex-shrink: 0; }
+    .tl-dot.done { background: var(--teal); color: white; }
+    .tl-dot.active { background: #FFF4E6; border: 2px solid #C87C00; color: #C87C00; }
+    .tl-dot.pending { background: var(--bg); border: 2px solid var(--border); color: var(--text-light); }
+    .tl-line { width: 2px; flex: 1; min-height: 18px; background: var(--border); margin: 3px 0; }
+    .tl-content { padding: 2px 0 20px; }
+    .tl-name { font-family: 'Sora', sans-serif; font-size: 0.875rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .tl-name.muted { color: var(--text-light); }
+    .tl-desc { font-size: 0.75rem; color: var(--text-light); }
+
+    .notes-box { background: var(--blue-soft); border: 1px solid var(--blue-light); border-radius: 10px; padding: 14px 16px; font-size: 0.875rem; color: var(--text-mid); line-height: 1.6; display: none; }
+    .notes-box.show { display: block; }
+
+    /* SPINNER */
+    .spinner-wrap { text-align: center; padding: 40px; }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin: auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 560px) {
+      .info-grid { grid-template-columns: 1fr; }
+      .search-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">CP</div>
+      <span class="logo-name">Civic<span>Pulse</span></span>
+    </a>
+    <div class="nav-right">
+      <a href="submit.html" class="btn-primary">+ Report Issue</a>
+      <a href="profile.html" class="btn-ghost">Profile</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="search-card">
+    <div class="search-label">Track Your Complaint</div>
+    <div class="search-row">
+      <input type="text" class="search-input" id="trackInput" placeholder="Enter tracking ID — e.g. CP-A4F82B1C"/>
+      <button class="search-btn" onclick="trackComplaint()">Track →</button>
+    </div>
+  </div>
+
+  <div id="loadingState" style="display:none;">
+    <div class="spinner-wrap"><div class="spinner"></div></div>
+  </div>
+
+  <div id="errorState" style="display:none;" class="error-box"></div>
+
+  <div id="emptyState" class="empty-state">
+    <div class="empty-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8896A5" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </div>
+    <div class="empty-title">Enter your tracking ID above</div>
+    <div class="empty-sub">Your tracking ID was provided when you submitted the complaint</div>
+  </div>
+
+  <div class="detail" id="detailView">
+
+    <div class="card">
+      <div class="detail-top">
+        <div>
+          <div class="detail-id" id="dId">—</div>
+          <div class="detail-type" id="dType">—</div>
+        </div>
+        <span class="status-badge" id="dStatusBadge">—</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-item" id="dLocation">—</span>
+        <span class="meta-dot"></span>
+        <span class="meta-item" id="dDate">—</span>
+        <span class="meta-dot"></span>
+        <span class="meta-item" id="dAuthority">—</span>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Priority</div>
+        <div class="info-value" id="dPriority">—</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Category</div>
+        <div class="info-value" id="dCategory">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">SDG Goals Linked</div>
+      <div class="sdg-tags" id="dSdg"></div>
+      <div class="sdg-msg" id="dSdgMsg"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label" style="margin-bottom:12px;">AI-Generated Formal Complaint</div>
+      <div class="formal-box" id="dFormal">—</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label" style="margin-bottom:16px;">Status Timeline</div>
+      <div class="timeline" id="dTimeline"></div>
+    </div>
+
+    <div class="notes-box" id="dNotesBox">
+      <div class="card-label" style="margin-bottom:8px;">Admin Notes</div>
+      <div id="dNotes"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const STATUSES = ['Submitted', 'Under Review', 'In Progress', 'Resolved'];
+  const STATUS_CLASS = { 'Submitted': 's-submitted', 'Under Review': 's-under-review', 'In Progress': 's-in-progress', 'Resolved': 's-resolved', 'Rejected': 's-rejected' };
+
+  const params = new URLSearchParams(window.location.search);
+  const idParam = params.get('id');
+  if (idParam) { document.getElementById('trackInput').value = idParam; trackComplaint(); }
+
+  function trackComplaint() {
+    const id = document.getElementById('trackInput').value.trim().toUpperCase();
+    if (!id) return;
+    show('loadingState'); hide('emptyState'); hide('errorState'); hide('detailView');
+
+    fetch(`${API}/complaints/track/${id}`)
+      .then(r => r.json())
+      .then(data => {
+        hide('loadingState');
+        if (!data.complaint) throw new Error(data.message || 'Not found');
+        renderDetail(data.complaint);
+      })
+      .catch(err => {
+        hide('loadingState');
+        document.getElementById('errorState').textContent = err.message || 'Complaint not found.';
+        show('errorState');
+      });
+  }
+
+  function renderDetail(c) {
+    document.getElementById('dId').textContent = c.trackingId;
+    document.getElementById('dType').textContent = c.category || 'Civic Issue';
+    document.getElementById('dLocation').textContent = c.location?.address ? c.location.address.split(',')[0] : 'Location not specified';
+    document.getElementById('dDate').textContent = new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('dAuthority').textContent = c.authority || 'Pending routing';
+    document.getElementById('dCategory').textContent = c.category || '—';
+    document.getElementById('dFormal').textContent = c.formalComplaint || '—';
+
+    const p = document.getElementById('dPriority');
+    p.textContent = c.priority || '—';
+    p.className = `info-value priority-${(c.priority || '').toLowerCase()}`;
+
+    const s = document.getElementById('dStatusBadge');
+    s.textContent = c.status;
+    s.className = `status-badge ${STATUS_CLASS[c.status] || 's-submitted'}`;
+
+    const sdgEl = document.getElementById('dSdg');
+    sdgEl.innerHTML = '';
+    (c.sdgTags || []).forEach(t => { const span = document.createElement('span'); span.className = 'sdg-tag'; span.textContent = t; sdgEl.appendChild(span); });
+    document.getElementById('dSdgMsg').textContent = c.sdgMessage || '';
+
+    const currentIdx = STATUSES.indexOf(c.status);
+    const timeline = document.getElementById('dTimeline');
+    timeline.innerHTML = '';
+    STATUSES.forEach((step, i) => {
+      const isDone = i < currentIdx || c.status === 'Resolved';
+      const isActive = i === currentIdx && c.status !== 'Resolved';
+      const isPending = i > currentIdx;
+      const isLast = i === STATUSES.length - 1;
+      const div = document.createElement('div');
+      div.className = 'tl-step';
+      div.innerHTML = `
+        <div class="tl-left">
+          <div class="tl-dot ${isDone ? 'done' : isActive ? 'active' : 'pending'}">${isDone ? '✓' : i + 1}</div>
+          ${!isLast ? '<div class="tl-line"></div>' : ''}
+        </div>
+        <div class="tl-content">
+          <div class="tl-name ${isPending ? 'muted' : ''}">${step}</div>
+          <div class="tl-desc">${getDesc(step, isDone, isActive)}</div>
+        </div>`;
+      timeline.appendChild(div);
+    });
+
+    if (c.adminNotes) {
+      document.getElementById('dNotes').textContent = c.adminNotes;
+      document.getElementById('dNotesBox').classList.add('show');
+    }
+
+    document.getElementById('detailView').classList.add('show');
+  }
+
+  function getDesc(step, done, active) {
+    const map = {
+      'Submitted': done || active ? 'Complaint received & AI processed' : 'Waiting for submission',
+      'Under Review': done ? 'Reviewed by authority' : active ? 'Currently under review' : 'Pending review',
+      'In Progress': done ? 'Work completed' : active ? 'Team assigned, work underway' : 'Not started yet',
+      'Resolved': done ? 'Issue has been resolved' : 'Awaiting resolution'
+    };
+    return map[step] || '';
+  }
+
+  function show(id) { document.getElementById(id).style.display = 'block'; }
+  function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+  document.getElementById('trackInput').addEventListener('keydown', e => { if (e.key === 'Enter') trackComplaint(); });
+</script>
+</body>
+</html>

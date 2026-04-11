@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CivicPulse — Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #2C5AA0; --blue-dark: #1e3f72; --blue-light: #C1E4F9; --blue-soft: #EBF4FD;
+      --teal: #00A8A8; --teal-soft: #E0F5F5;
+      --bg: #F5F7FA; --white: #ffffff;
+      --text: #222222; --text-mid: #4A5568; --text-light: #8896A5;
+      --border: #E2E8F0; --sidebar-bg: #0f1e38;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(44,90,160,0.06);
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    a { text-decoration: none; color: inherit; }
+
+    .sidebar { width: 240px; background: var(--sidebar-bg); min-height: 100vh; display: flex; flex-direction: column; padding: 24px 0; position: fixed; top: 0; left: 0; z-index: 100; }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 20px; }
+    .logo-icon { width: 34px; height: 34px; background: var(--blue); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 0.7rem; color: white; }
+    .logo-name { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.05rem; color: white; }
+    .logo-name span { color: var(--teal); }
+    .dept-chip { margin: 0 16px 20px; background: rgba(44,90,160,0.2); border: 1px solid rgba(44,90,160,0.3); border-radius: 8px; padding: 8px 12px; }
+    .dept-chip-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.3); margin-bottom: 3px; }
+    .dept-chip-name { font-family: 'Sora', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--teal); }
+    .nav-group { padding: 0 12px; margin-bottom: 6px; }
+    .nav-group-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.2); padding: 0 8px; margin-bottom: 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; color: rgba(255,255,255,0.45); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; margin-bottom: 2px; }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+    .nav-item.active { background: rgba(44,90,160,0.25); color: var(--blue-light); }
+    .sidebar-bottom { margin-top: auto; padding: 16px 12px 0; border-top: 1px solid rgba(255,255,255,0.06); }
+    .admin-row { display: flex; align-items: center; gap: 10px; padding: 10px; }
+    .admin-av { width: 32px; height: 32px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 0.82rem; color: white; flex-shrink: 0; }
+    .admin-name { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+    .admin-role { font-size: 0.68rem; color: rgba(255,255,255,0.3); }
+    .logout-btn { width: 100%; margin-top: 8px; padding: 9px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 0.8rem; font-weight: 500; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.15s; }
+    .logout-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
+
+    .main { margin-left: 240px; flex: 1; padding: 32px 36px 60px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .page-title { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+    .page-sub { font-size: 0.83rem; color: var(--text-light); margin-top: 3px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: var(--shadow); }
+    .stat-num { font-family: 'Sora', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 0.75rem; color: var(--text-light); font-weight: 500; }
+
+    .rate-card { background: var(--blue); border-radius: 16px; padding: 28px; margin-bottom: 20px; display: flex; align-items: center; gap: 32px; flex-wrap: wrap; box-shadow: 0 4px 20px rgba(44,90,160,0.25); }
+    .rate-circle { position: relative; flex-shrink: 0; }
+    .rate-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .rate-num { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 800; color: white; line-height: 1; }
+    .rate-pct { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+    .rate-info { flex: 1; }
+    .rate-title { font-family: 'Sora', sans-serif; font-size: 1.1rem; font-weight: 800; color: white; margin-bottom: 6px; }
+    .rate-desc { font-size: 0.875rem; color: rgba(255,255,255,0.45); line-height: 1.6; margin-bottom: 16px; }
+    .rate-stats { display: flex; gap: 24px; }
+    .rs { display: flex; flex-direction: column; gap: 3px; }
+    .rs-num { font-family: 'Sora', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--teal); }
+    .rs-label { font-size: 0.7rem; color: rgba(255,255,255,0.35); }
+
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .chart-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 22px; box-shadow: var(--shadow); }
+    .chart-card.full { grid-column: 1 / -1; }
+    .card-title { font-family: 'Sora', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .card-sub { font-size: 0.75rem; color: var(--text-light); margin-bottom: 18px; }
+
+    .sdg-section { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 22px; box-shadow: var(--shadow); }
+    .sdg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 4px; }
+    .sdg-card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 14px; transition: border-color 0.15s; }
+    .sdg-card:hover { border-color: var(--teal); }
+    .sdg-num { font-family: 'Sora', sans-serif; font-size: 0.7rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .sdg-name { font-family: 'Sora', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+    .sdg-count { font-family: 'Sora', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--text); }
+    .sdg-count span { font-size: 0.72rem; color: var(--text-light); font-weight: 500; }
+    .sdg-bar { height: 4px; background: var(--border); border-radius: 10px; margin-top: 8px; overflow: hidden; }
+    .sdg-bar-fill { height: 100%; background: var(--teal); border-radius: 10px; transition: width 0.8s ease; }
+
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 28px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(2,1fr); } .charts-grid { grid-template-columns: 1fr; } .sdg-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 20px; } }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">CP</div>
+    <span class="logo-name">Civic<span>Pulse</span></span>
+  </div>
+  <div class="dept-chip">
+    <div class="dept-chip-label">Department</div>
+    <div class="dept-chip-name" id="sidebarDept">Loading...</div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="complaints.html" class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Complaints</a>
+    <a href="map.html" class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map View</a>
+    <a href="analytics.html" class="nav-item active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="admin-row">
+      <div class="admin-av" id="sidebarInitial">A</div>
+      <div><div class="admin-name" id="sidebarName">Admin</div><div class="admin-role" id="sidebarRole">Authority</div></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div><div class="page-title">Analytics</div><div class="page-sub">SDG impact, category trends and resolution insights</div></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="sTotalComplaints">—</div><div class="stat-label">Total Complaints</div></div>
+    <div class="stat-card"><div class="stat-num" id="sResolutionRate">—%</div><div class="stat-label">Resolution Rate</div></div>
+    <div class="stat-card"><div class="stat-num" id="sCritical">—</div><div class="stat-label">Critical Issues</div></div>
+    <div class="stat-card"><div class="stat-num" id="sAvgTime">—d</div><div class="stat-label">Avg. Resolution Days</div></div>
+  </div>
+
+  <div class="rate-card">
+    <div class="rate-circle">
+      <svg width="108" height="108" viewBox="0 0 108 108">
+        <circle cx="54" cy="54" r="44" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="12"/>
+        <circle cx="54" cy="54" r="44" fill="none" stroke="#00A8A8" stroke-width="12"
+          stroke-dasharray="276" stroke-dashoffset="276" stroke-linecap="round"
+          transform="rotate(-90 54 54)" id="rateCircle"/>
+      </svg>
+      <div class="rate-text"><div class="rate-num" id="rateNum">0%</div><div class="rate-pct">resolved</div></div>
+    </div>
+    <div class="rate-info">
+      <div class="rate-title">Resolution Performance</div>
+      <div class="rate-desc">Percentage of complaints successfully resolved by your department.</div>
+      <div class="rate-stats">
+        <div class="rs"><div class="rs-num" id="rResolved">—</div><div class="rs-label">Resolved</div></div>
+        <div class="rs"><div class="rs-num" id="rPending">—</div><div class="rs-label">Pending</div></div>
+        <div class="rs"><div class="rs-num" id="rTotal">—</div><div class="rs-label">Total</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="card-title">Complaints by Category</div>
+      <div class="card-sub">Distribution across issue types</div>
+      <div style="height:220px;"><canvas id="categoryChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="card-title">Priority Distribution</div>
+      <div class="card-sub">Urgency breakdown</div>
+      <div style="height:220px;"><canvas id="priorityChart"></canvas></div>
+    </div>
+    <div class="chart-card full">
+      <div class="card-title">Complaints Over Time</div>
+      <div class="card-sub">Daily volume — last 14 days</div>
+      <div style="height:200px;"><canvas id="trendChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="sdg-section">
+    <div class="card-title" style="margin-bottom:4px;">SDG Impact Overview</div>
+    <div class="card-sub">UN Sustainable Development Goals linked to complaints</div>
+    <div class="sdg-grid" id="sdgGrid"><div class="spinner"></div></div>
+  </div>
+</main>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('cp_token');
+  const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
+  if (!token || user.role !== 'admin') window.location.href = 'login.html';
+
+  document.getElementById('sidebarName').textContent = user.name || 'Admin';
+  document.getElementById('sidebarInitial').textContent = (user.name || 'A').charAt(0).toUpperCase();
+  document.getElementById('sidebarDept').textContent = user.department || 'Super Admin';
+  document.getElementById('sidebarRole').textContent = user.department ? `${user.department} Dept.` : 'All Departments';
+
+  const SDG_INFO = {
+    'SDG 6': { name: 'Clean Water & Sanitation' }, 'SDG 7': { name: 'Clean Energy' },
+    'SDG 11': { name: 'Sustainable Cities' }, 'SDG 12': { name: 'Responsible Consumption' },
+    'SDG 13': { name: 'Climate Action' }, 'SDG 3': { name: 'Good Health' },
+    'SDG 15': { name: 'Life on Land' }, 'SDG 9': { name: 'Infrastructure' },
+  };
+
+  const COLORS = ['#2C5AA0','#00A8A8','#C0392B','#C87C00','#B7791F','#1A7A50','#6B46C1','#C05621'];
+
+  async function loadAnalytics() {
+    try {
+      const res = await fetch(`${API}/admin/analytics`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      if (!res.ok) throw new Error();
+      const { stats, categoryBreakdown, priorityBreakdown, sdgBreakdown, trendData } = data;
+
+      const total = stats.total || 0, resolved = stats.resolved || 0;
+      const rate = total ? Math.round((resolved / total) * 100) : 0;
+
+      document.getElementById('sTotalComplaints').textContent = total;
+      document.getElementById('sResolutionRate').textContent = `${rate}%`;
+      document.getElementById('sCritical').textContent = stats.critical || 0;
+      document.getElementById('sAvgTime').textContent = `${stats.avgDays || '—'}d`;
+      document.getElementById('rateNum').textContent = `${rate}%`;
+      document.getElementById('rResolved').textContent = resolved;
+      document.getElementById('rPending').textContent = total - resolved;
+      document.getElementById('rTotal').textContent = total;
+
+      const circ = 276;
+      setTimeout(() => {
+        const el = document.getElementById('rateCircle');
+        el.style.transition = 'stroke-dashoffset 1s ease';
+        el.style.strokeDashoffset = circ - (rate / 100) * circ;
+      }, 200);
+
+      renderCategoryChart(categoryBreakdown || {});
+      renderPriorityChart(priorityBreakdown || {});
+      renderTrendChart(trendData || []);
+      renderSDG(sdgBreakdown || {});
+    } catch {
+      renderCategoryChart({ 'Garbage & Waste': 8, 'Roads': 6, 'Water Supply': 4 });
+      renderPriorityChart({ Critical: 3, High: 8, Medium: 12, Low: 5 });
+      renderTrendChart([]);
+      document.getElementById('sdgGrid').innerHTML = '<p style="color:var(--text-light);font-size:0.875rem;padding:8px;">Connect backend to see SDG data.</p>';
+    }
+  }
+
+  function renderCategoryChart(data) {
+    new Chart(document.getElementById('categoryChart'), {
+      type: 'bar',
+      data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: COLORS, borderRadius: 6, borderSkipped: false }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#8896A5' } }, y: { grid: { color: '#E2E8F0' }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#8896A5' }, beginAtZero: true } } }
+    });
+  }
+
+  function renderPriorityChart(data) {
+    const colors = { Critical: '#C0392B', High: '#C87C00', Medium: '#B7791F', Low: '#00A8A8' };
+    new Chart(document.getElementById('priorityChart'), {
+      type: 'doughnut',
+      data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: Object.keys(data).map(k => colors[k] || '#ccc'), borderWidth: 0, hoverOffset: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { family: 'Plus Jakarta Sans', size: 12 }, color: '#4A5568', padding: 14, usePointStyle: true } } }, cutout: '65%' }
+    });
+  }
+
+  function renderTrendChart(trendData) {
+    const last14 = [];
+    for (let i = 13; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); last14.push(d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })); }
+    const values = trendData.length ? trendData : last14.map(() => Math.floor(Math.random() * 6));
+    new Chart(document.getElementById('trendChart'), {
+      type: 'line',
+      data: { labels: last14, datasets: [{ data: values, borderColor: '#2C5AA0', backgroundColor: 'rgba(44,90,160,0.07)', borderWidth: 2.5, fill: true, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#2C5AA0', pointBorderColor: '#fff', pointBorderWidth: 2 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#8896A5' } }, y: { grid: { color: '#E2E8F0' }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#8896A5' }, beginAtZero: true } } }
+    });
+  }
+
+  function renderSDG(sdgData) {
+    const maxVal = Math.max(...Object.values(sdgData), 1);
+    const entries = Object.entries(sdgData);
+    if (!entries.length) { document.getElementById('sdgGrid').innerHTML = '<p style="color:var(--text-light);font-size:0.875rem;padding:8px;">No SDG data yet.</p>'; return; }
+    document.getElementById('sdgGrid').innerHTML = entries.map(([sdg, count]) => {
+      const info = SDG_INFO[sdg] || { name: sdg };
+      const pct = Math.round((count / maxVal) * 100);
+      return `<div class="sdg-card">
+        <div class="sdg-num">${sdg}</div>
+        <div class="sdg-name">${info.name}</div>
+        <div class="sdg-count">${count} <span>complaints</span></div>
+        <div class="sdg-bar"><div class="sdg-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  function logout() { localStorage.removeItem('cp_token'); localStorage.removeItem('cp_user'); sessionStorage.setItem('logged_out','1'); window.location.replace('login.html'); }
+
+  loadAnalytics();
+</script>
+</body>
+</html>

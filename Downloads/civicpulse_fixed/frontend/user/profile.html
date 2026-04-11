@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CivicPulse — My Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #2C5AA0; --blue-dark: #1e3f72; --blue-light: #C1E4F9; --blue-soft: #EBF4FD;
+      --teal: #00A8A8; --teal-soft: #E0F5F5;
+      --bg: #F5F7FA; --white: #ffffff;
+      --text: #222222; --text-mid: #4A5568; --text-light: #8896A5;
+      --border: #E2E8F0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(44,90,160,0.06);
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    nav { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .nav-inner { padding: 0 5%; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 34px; height: 34px; background: var(--blue); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 0.7rem; color: white; }
+    .logo-name { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--text); }
+    .logo-name span { color: var(--blue); }
+    .nav-right { display: flex; gap: 8px; }
+    .btn-ghost { padding: 6px 14px; border: 1.5px solid var(--border); background: transparent; color: var(--text-mid); border-radius: 8px; font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: border-color 0.15s, color 0.15s; }
+    .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+    .btn-primary { padding: 6px 16px; background: var(--blue); color: white; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.15s; }
+    .btn-primary:hover { background: var(--blue-dark); }
+
+    .page { max-width: 900px; margin: auto; padding: 44px 5% 80px; }
+
+    .profile-hero {
+      background: var(--blue); border-radius: 20px; padding: 36px;
+      display: flex; align-items: center; gap: 28px; margin-bottom: 20px;
+      flex-wrap: wrap; position: relative; overflow: hidden;
+    }
+    .profile-hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 220px; height: 220px; background: rgba(255,255,255,0.04); border-radius: 50%; }
+    .profile-hero::after { content: ''; position: absolute; bottom: -40px; left: 30%; width: 160px; height: 160px; background: rgba(0,168,168,0.08); border-radius: 50%; }
+
+    .avatar { width: 68px; height: 68px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-size: 1.6rem; font-weight: 800; color: white; flex-shrink: 0; position: relative; z-index: 1; }
+    .profile-info { flex: 1; position: relative; z-index: 1; }
+    .profile-name { font-family: 'Sora', sans-serif; font-size: 1.4rem; font-weight: 800; color: white; margin-bottom: 4px; }
+    .profile-email { font-size: 0.85rem; color: rgba(255,255,255,0.45); margin-bottom: 12px; }
+    .profile-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .profile-tag { padding: 4px 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.8); }
+    .points-box { text-align: right; position: relative; z-index: 1; }
+    .points-num { font-family: 'Sora', sans-serif; font-size: 2.2rem; font-weight: 800; color: white; line-height: 1; }
+    .points-label { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; box-shadow: var(--shadow); }
+    .stat-num { font-family: 'Sora', sans-serif; font-size: 1.7rem; font-weight: 800; color: var(--text); }
+    .stat-label { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; font-weight: 500; }
+
+    .section-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 14px; }
+
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+
+    .badges-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .badge-item { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 8px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg); }
+    .badge-item.earned { border-color: var(--blue-light); background: var(--blue-soft); }
+    .badge-item.locked { opacity: 0.45; }
+    .badge-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .badge-icon.ei { background: var(--blue); }
+    .badge-icon.li { background: var(--border); }
+    .badge-name { font-family: 'Sora', sans-serif; font-size: 0.68rem; font-weight: 700; color: var(--text-mid); text-align: center; line-height: 1.3; }
+    .badge-pts { font-size: 0.65rem; color: var(--blue); font-weight: 600; }
+    .badge-unlock { font-size: 0.62rem; color: var(--text-light); text-align: center; }
+
+    .complaint-row { display: flex; align-items: center; gap: 12px; padding: 12px 8px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; transition: background 0.15s; }
+    .complaint-row:last-child { border-bottom: none; }
+    .complaint-row:hover { background: var(--bg); }
+    .cr-icon { width: 36px; height: 36px; border-radius: 9px; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+    .cr-info { flex: 1; }
+    .cr-type { font-family: 'Sora', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .cr-meta { font-size: 0.73rem; color: var(--text-light); }
+    .cr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .status-pill { padding: 3px 10px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; }
+    .s-submitted { background: #F0F0F0; color: #555; }
+    .s-under-review { background: var(--blue-soft); color: var(--blue); }
+    .s-in-progress { background: #FFF4E6; color: #C87C00; }
+    .s-resolved { background: #E8FBF5; color: #1A7A50; }
+    .s-rejected { background: #FFF0F0; color: #C0392B; }
+    .cr-id { font-family: monospace; font-size: 0.65rem; color: var(--text-light); }
+
+    .lb-row { display: flex; align-items: center; gap: 12px; padding: 10px 8px; border-bottom: 1px solid var(--border); border-radius: 8px; }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-row.you { background: var(--blue-soft); border-bottom: none; margin: 0 -8px; padding: 10px 16px; }
+    .lb-rank { font-family: 'Sora', sans-serif; font-size: 0.9rem; font-weight: 800; color: var(--text-light); width: 28px; text-align: center; flex-shrink: 0; }
+    .lb-rank.top { color: var(--blue); }
+    .lb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.82rem; color: var(--text-mid); flex-shrink: 0; }
+    .lb-avatar.you-av { background: var(--blue); color: white; border-color: var(--blue); }
+    .lb-name { flex: 1; font-size: 0.875rem; font-weight: 600; color: var(--text); }
+    .you-tag { font-size: 0.62rem; color: var(--blue); font-weight: 700; background: var(--blue-light); padding: 1px 6px; border-radius: 10px; margin-left: 6px; }
+    .lb-pts { font-family: 'Sora', sans-serif; font-size: 0.875rem; font-weight: 700; color: var(--text); }
+
+    .empty { text-align: center; padding: 28px; color: var(--text-light); font-size: 0.875rem; }
+    .empty a { color: var(--blue); font-weight: 600; }
+    .spinner-wrap { text-align: center; padding: 28px; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin: auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 640px) {
+      .badges-grid { grid-template-columns: repeat(3, 1fr); }
+      .profile-hero { flex-direction: column; }
+      .points-box { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">CP</div>
+      <span class="logo-name">Civic<span>Pulse</span></span>
+    </a>
+    <div class="nav-right">
+      <a href="submit.html" class="btn-primary">+ Report Issue</a>
+      <a href="track.html" class="btn-ghost">Track</a>
+      <button class="btn-ghost" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="profile-hero">
+    <div class="avatar" id="avatarInitial">?</div>
+    <div class="profile-info">
+      <div class="profile-name" id="profileName">Loading...</div>
+      <div class="profile-email" id="profileEmail"></div>
+      <div class="profile-tags">
+        <span class="profile-tag">Active Citizen</span>
+        <span class="profile-tag" id="rankTag">Rank #—</span>
+      </div>
+    </div>
+    <div class="points-box">
+      <div class="points-num" id="profilePoints">0</div>
+      <div class="points-label">Total Points</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Complaints Filed</div></div>
+    <div class="stat-card"><div class="stat-num" id="statResolved">—</div><div class="stat-label">Resolved</div></div>
+    <div class="stat-card"><div class="stat-num" id="statBadges">—</div><div class="stat-label">Badges Earned</div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Badges</div>
+    <div class="badges-grid" id="badgesGrid"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">My Complaints</div>
+    <div id="historyContent"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Leaderboard</div>
+    <div id="leaderboardContent"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  const token = localStorage.getItem('cp_token');
+  const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
+  if (!token) window.location.href = 'login.html';
+
+  const ALL_BADGES = [
+    { id: 'civic_starter', icon: '🌱', name: 'Civic Starter', pts: '50 pts', unlock: 'First complaint' },
+    { id: 'eco_warrior', icon: '♻️', name: 'Eco Warrior', pts: '200 pts', unlock: 'SDG complaint' },
+    { id: 'rapid_reporter', icon: '⚡', name: 'Rapid Reporter', pts: '150 pts', unlock: 'High priority' },
+    { id: 'city_guardian', icon: '🛡️', name: 'City Guardian', pts: '500 pts', unlock: '10 complaints' },
+    { id: 'community_hero', icon: '🏆', name: 'Community Hero', pts: '1000 pts', unlock: 'Top 10 rank' },
+  ];
+
+  const CAT_ICONS = { roads: '🛣️', water: '💧', garbage: '🗑️', drainage: '🌊', electricity: '⚡', other: '📋', 'Roads & Infrastructure': '🛣️', 'Water Supply': '💧', 'Garbage & Waste': '🗑️', 'Drainage & Sewage': '🌊', 'Electricity & Streetlights': '⚡', 'Public Nuisance': '📋' };
+  const STATUS_CLASS = { 'Submitted': 's-submitted', 'Under Review': 's-under-review', 'In Progress': 's-in-progress', 'Resolved': 's-resolved', 'Rejected': 's-rejected' };
+
+  if (user.name) {
+    document.getElementById('profileName').textContent = user.name;
+    document.getElementById('profileEmail').textContent = user.email || '';
+    document.getElementById('avatarInitial').textContent = user.name.charAt(0).toUpperCase();
+    document.getElementById('profilePoints').textContent = user.points || 0;
+  }
+
+  async function loadProfile() {
+    try {
+      const res = await fetch(`${API}/users/profile`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      if (!res.ok) throw new Error();
+      const u = data.user;
+      document.getElementById('profileName').textContent = u.name;
+      document.getElementById('profileEmail').textContent = u.email;
+      document.getElementById('avatarInitial').textContent = u.name.charAt(0).toUpperCase();
+      document.getElementById('profilePoints').textContent = u.points || 0;
+      renderBadges(u.badges || []);
+      renderStats(data.complaints || []);
+      renderHistory(data.complaints || []);
+    } catch { renderBadges(user.badges || []); }
+  }
+
+  async function loadLeaderboard() {
+    try {
+      const res = await fetch(`${API}/users/leaderboard`, { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      renderLeaderboard(data.leaderboard || []);
+    } catch { document.getElementById('leaderboardContent').innerHTML = '<div class="empty">Could not load leaderboard</div>'; }
+  }
+
+  function renderBadges(earned) {
+    document.getElementById('statBadges').textContent = earned.length;
+    document.getElementById('badgesGrid').innerHTML = ALL_BADGES.map(b => {
+      const e = earned.includes(b.id);
+      return `<div class="badge-item ${e ? 'earned' : 'locked'}">
+        <div class="badge-icon ${e ? 'ei' : 'li'}">${b.icon}</div>
+        <span class="badge-name">${b.name}</span>
+        ${e ? `<span class="badge-pts">${b.pts}</span>` : `<span class="badge-unlock">${b.unlock}</span>`}
+      </div>`;
+    }).join('');
+  }
+
+  function renderStats(c) {
+    document.getElementById('statTotal').textContent = c.length;
+    document.getElementById('statResolved').textContent = c.filter(x => x.status === 'Resolved').length;
+  }
+
+  function renderHistory(complaints) {
+    const el = document.getElementById('historyContent');
+    if (!complaints.length) { el.innerHTML = '<div class="empty">No complaints filed yet. <a href="submit.html">Report your first issue →</a></div>'; return; }
+    el.innerHTML = complaints.map(c => `
+      <div class="complaint-row" onclick="window.location.href='track.html?id=${c.trackingId}'">
+        <div class="cr-icon">${CAT_ICONS[c.category] || '📋'}</div>
+        <div class="cr-info">
+          <div class="cr-type">${c.category || 'Civic Issue'}</div>
+          <div class="cr-meta">${c.location?.address ? c.location.address.split(',')[0] : 'Location not set'} · ${new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</div>
+        </div>
+        <div class="cr-right">
+          <span class="status-pill ${STATUS_CLASS[c.status] || 's-submitted'}">${c.status}</span>
+          <span class="cr-id">${c.trackingId}</span>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderLeaderboard(board) {
+    const el = document.getElementById('leaderboardContent');
+    if (!board.length) { el.innerHTML = '<div class="empty">Leaderboard loading...</div>'; return; }
+    const userId = user.id || user._id;
+    const userRank = board.findIndex(u => u._id === userId) + 1;
+    if (userRank) document.getElementById('rankTag').textContent = `Rank #${userRank}`;
+    el.innerHTML = board.slice(0, 10).map((u, i) => {
+      const isYou = u._id === userId;
+      const rank = i + 1;
+      return `<div class="lb-row ${isYou ? 'you' : ''}">
+        <span class="lb-rank ${rank <= 3 ? 'top' : ''}">${rank}</span>
+        <div class="lb-avatar ${isYou ? 'you-av' : ''}">${u.name.charAt(0).toUpperCase()}</div>
+        <span class="lb-name">${u.name}${isYou ? '<span class="you-tag">YOU</span>' : ''}</span>
+        <span class="lb-pts">${u.points} pts</span>
+      </div>`;
+    }).join('');
+  }
+
+  function logout() { localStorage.removeItem('cp_token'); localStorage.removeItem('cp_user'); sessionStorage.setItem('logged_out','1'); window.location.replace('login.html'); }
+
+  loadProfile();
+  loadLeaderboard();
+</script>
+</body>
+</html>
