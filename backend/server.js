@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 dotenv.config();
 
@@ -14,6 +15,16 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Rate limit — 3 complaints per hour per IP
+const complaintLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  message: { message: 'Too many complaints submitted. Please try again after an hour.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/complaints', complaintLimit);
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
