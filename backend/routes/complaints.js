@@ -25,6 +25,26 @@ const DEPARTMENT_MAP = {
   'Public Nuisance': 'Municipal',
 };
 
+const AUTHORITY_MAP = {
+  'Sanitation':  'Municipal Sanitation Department',
+  'Water':       'Water Supply & Sewerage Board',
+  'Roads':       'Public Works Department (PWD)',
+  'Electricity': 'Electricity Distribution Department',
+  'Municipal':   'Municipal Corporation',
+};
+
+// Detect priority from complaint text keywords when Gemini is unavailable
+function detectPriority(text) {
+  const t = text.toLowerCase();
+  if (/(accident|fire|flood|electric shock|collapse|danger|emergency|death|sewage overflow|no water.*days|blackout)/.test(t))
+    return 'Critical';
+  if (/(no water|no electricity|major|broken|blocked|overflow|days|week|urgent|severe|injury)/.test(t))
+    return 'High';
+  if (/(pothole|garbage|dirty|smell|noise|delay|not working|leaking|crack)/.test(t))
+    return 'Medium';
+  return 'Low';
+}
+
 async function processWithGemini(text, category) {
   const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
@@ -36,26 +56,35 @@ Suggested category: "${category || 'unknown'}"
 Rules:
 - category: pick the BEST match from: Garbage & Waste, Water Supply, Roads & Infrastructure, Electricity & Streetlights, Drainage & Sewage, Public Nuisance
 - priority: Critical (immediate danger/health risk), High (major disruption), Medium (moderate issue), Low (minor inconvenience)
-- authority: the specific department name e.g. "Municipal Sanitation Department" or "Public Works Department"
+- authority: the specific department name e.g. "Municipal Sanitation Department" or "Public Works Department (PWD)" or "Water Supply & Sewerage Board" or "Electricity Distribution Department"
 - department: one of exactly: Sanitation, Water, Roads, Electricity, Municipal
 - sdgTags: array of relevant SDG numbers e.g. ["SDG 11", "SDG 6"]
 - sdgMessage: one sentence about environmental/social impact
 - formalComplaint: formal 2-3 sentence complaint in official language
+
+IMPORTANT: The department and authority must match the category — do NOT assign Municipal/Municipal Corporation unless category is Public Nuisance.
 
 Return ONLY this JSON:
 {"category":"...","priority":"...","authority":"...","department":"...","sdgTags":["..."],"sdgMessage":"...","formalComplaint":"..."}`;
 
   const result = await model.generateContent(prompt);
   let text2 = result.response.text().trim();
-  // Remove any markdown code blocks if present
   text2 = text2.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  // Find JSON object
   const start = text2.indexOf('{');
   const end = text2.lastIndexOf('}');
   if (start !== -1 && end !== -1) {
     text2 = text2.substring(start, end + 1);
   }
-  return JSON.parse(text2);
+  const parsed = JSON.parse(text2);
+
+  // Safety net: if Gemini returns wrong department for the category, correct it
+  const expectedDept = DEPARTMENT_MAP[parsed.category];
+  if (expectedDept && parsed.department !== expectedDept) {
+    parsed.department = expectedDept;
+    parsed.authority = AUTHORITY_MAP[expectedDept];
+  }
+
+  return parsed;
 }
 
 // POST /api/complaints
@@ -75,12 +104,16 @@ router.post('/', protect, (req, res, next) => {
       console.log('Gemini result:', aiData);
     } catch (aiErr) {
       console.error('Gemini error:', aiErr.message);
-      // Smart fallback based on category
+
+      // Smart fallback — derive department & authority from user-selected category
       const dept = DEPARTMENT_MAP[category] || 'Municipal';
+      const authority = AUTHORITY_MAP[dept];
+      const priority = detectPriority(rawText); // dynamic, not hardcoded
+
       aiData = {
         category: category || 'Public Nuisance',
-        priority: 'Medium',
-        authority: `${dept} Department`,
+        priority,
+        authority,
         department: dept,
         sdgTags: ['SDG 11'],
         sdgMessage: 'This issue affects sustainable urban living and community well-being.',

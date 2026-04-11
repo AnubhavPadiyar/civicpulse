@@ -252,6 +252,11 @@
       <img id="mImage" src="" alt="Complaint photo" style="width:100%;border-radius:10px;max-height:200px;object-fit:cover;"/>
     </div>
 
+    <div class="modal-section" id="mImageSection" style="display:none;margin-bottom:18px;">
+      <div class="modal-label">Attached Photo</div>
+      <img id="mImage" src="" alt="Complaint photo" style="width:100%;border-radius:10px;max-height:220px;object-fit:cover;border:1px solid var(--border);"/>
+    </div>
+
     <div class="update-section">
       <div class="update-title">Update Complaint</div>
       <select class="update-select" id="updateStatus">
@@ -345,6 +350,13 @@
     } else {
       document.getElementById('mImageSection').style.display = 'none';
     }
+    // Show image if exists
+    if (c.imageUrl) {
+      document.getElementById('mImage').src = 'http://localhost:5000' + c.imageUrl;
+      document.getElementById('mImageSection').style.display = 'block';
+    } else {
+      document.getElementById('mImageSection').style.display = 'none';
+    }
     document.getElementById('updateStatus').value = c.status;
     document.getElementById('updateNotes').value = c.adminNotes || '';
     document.getElementById('modalOverlay').classList.add('open');
@@ -380,7 +392,7 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  function logout() { localStorage.removeItem('cp_token'); localStorage.removeItem('cp_user'); window.location.href = 'login.html'; }
+  function logout() { localStorage.removeItem('cp_token'); localStorage.removeItem('cp_user'); sessionStorage.setItem('logged_out','1'); window.location.replace('login.html'); }
 
   loadComplaints();
 </script>

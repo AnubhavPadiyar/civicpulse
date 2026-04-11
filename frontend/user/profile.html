@@ -110,7 +110,6 @@
       .points-box { text-align: left; }
     }
   </style>
-  <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 
@@ -267,7 +266,7 @@
     }).join('');
   }
 
-  function logout() { localStorage.removeItem('cp_token'); localStorage.removeItem('cp_user'); window.location.href = 'login.html'; }
+  function logout() { localStorage.removeItem('cp_token'); localStorage.removeItem('cp_user'); sessionStorage.setItem('logged_out','1'); window.location.replace('login.html'); }
 
   loadProfile();
   loadLeaderboard();

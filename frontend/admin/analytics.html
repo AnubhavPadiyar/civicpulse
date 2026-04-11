@@ -87,7 +87,6 @@
     @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(2,1fr); } .charts-grid { grid-template-columns: 1fr; } .sdg-grid { grid-template-columns: repeat(2,1fr); } }
     @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding: 20px; } }
   </style>
-  <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 
@@ -276,7 +275,7 @@
     }).join('');
   }
 
-  function logout() { localStorage.removeItem('cp_token'); localStorage.removeItem('cp_user'); window.location.href = 'login.html'; }
+  function logout() { localStorage.removeItem('cp_token'); localStorage.removeItem('cp_user'); sessionStorage.setItem('logged_out','1'); window.location.replace('login.html'); }
 
   loadAnalytics();
 </script>
